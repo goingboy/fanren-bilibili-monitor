@@ -1,210 +1,200 @@
 """
-凡人修仙传 B站实时数据监控 - Flask 后端
+凡人修仙传 B站实时数据监控 - Flask 后端（薄路由层）
+数据层见 cache_store / bilibili_api / img_cache / sampler
 """
-import json
-import os
-import time
 import threading
-from flask import Flask, render_template, jsonify, request, Response
-from flask_cors import CORS
-from bilibili_api import api, FANREN_SEASONS
-import requests as req
 
-app = Flask(__name__)
-CORS(app)
+from flask import Flask, Response, jsonify, render_template, request
 
-# 数据缓存
-_cache = {
-    "episodes": None,
-    "episodes_time": 0,
-    "overview": None,
-    "overview_time": 0,
-    "realtime": {},       # {aid: {"count": N, "time": T}}
-    "trend": {},          # {aid: [{"count": N, "time": T}, ...]}
-    "ep_stat": {},        # {aid: {stat_dict}}
-    "ep_stat_time": {},   # {aid: timestamp}
-}
+import img_cache
+import sampler
+from bilibili_api import FANREN_SEASONS, api
+from cache_store import CacheStore
+from config import (BATCH_AID_LIMIT, BATCH_WORKERS, DEBUG, EPISODES_TTL,
+                    HOST, OVERVIEW_TTL, PORT, REALTIME_TTL,
+                    SAMPLER_INTERVAL)
 
-CACHE_DIR = os.path.join(os.path.dirname(__file__), "data")
-TREND_FILE = os.path.join(CACHE_DIR, "trend.json")
-HISTORY_TREND_MAX = 200
+store = CacheStore()
 
-def load_trend_data():
-    if os.path.exists(TREND_FILE):
-        try:
-            with open(TREND_FILE, "r", encoding="utf-8") as f:
-                _cache["trend"] = json.load(f)
-        except Exception:
-            _cache["trend"] = {}
+_save_lock = threading.Lock()
+_save_timer = None
 
-def save_trend_data():
-    os.makedirs(CACHE_DIR, exist_ok=True)
+
+def _schedule_save():
+    """2 秒防抖落盘，避免高频写盘"""
+    global _save_timer
+    with _save_lock:
+        if _save_timer is None:
+            _save_timer = threading.Timer(2.0, _do_save)
+            _save_timer.daemon = True
+            _save_timer.start()
+
+
+def _do_save():
+    global _save_timer
     try:
-        with open(TREND_FILE, "w", encoding="utf-8") as f:
-            json.dump(_cache["trend"], f, ensure_ascii=False)
-    except Exception as e:
-        print(f"[存储] 保存趋势数据失败: {e}")
-
-load_trend_data()
+        store.save()
+    finally:
+        with _save_lock:
+            _save_timer = None
 
 
-@app.route("/")
-def index():
-    return render_template("index.html")
+def ensure_episodes():
+    eps, hit = store.get("episodes")
+    if hit:
+        return eps
+    eps = api.get_all_episodes()
+    if eps:
+        store.set("episodes", eps, EPISODES_TTL)
+    return eps
 
 
-@app.route("/wiki")
-def wiki():
-    return render_template("wiki.html")
+def create_app():
+    app = Flask(__name__)
+    app.config["SEND_FILE_MAX_AGE_DEFAULT"] = 86400
 
+    @app.route("/")
+    def index():
+        return render_template("index.html")
 
-@app.route("/api/seasons")
-def get_seasons():
-    return jsonify({"code": 0, "data": FANREN_SEASONS})
+    @app.route("/wiki")
+    def wiki():
+        return render_template("wiki.html")
 
+    @app.route("/api/seasons")
+    def get_seasons():
+        return jsonify({"code": 0, "data": FANREN_SEASONS})
 
-@app.route("/api/episodes")
-def get_episodes():
-    """获取所有集信息（缓存 5 分钟）"""
-    now = time.time()
-    if _cache["episodes"] and now - _cache["episodes_time"] < 300:
-        return jsonify({"code": 0, "data": _cache["episodes"]})
+    @app.route("/api/episodes")
+    def get_episodes():
+        eps = ensure_episodes()
+        if not eps:
+            return jsonify({"code": -1, "message": "上游接口不可用，请稍后重试"})
+        return jsonify({"code": 0, "data": eps})
 
-    episodes = api.get_all_episodes()
-    _cache["episodes"] = episodes
-    _cache["episodes_time"] = now
-    return jsonify({"code": 0, "data": episodes})
-
-
-@app.route("/api/realtime")
-def get_realtime():
-    """获取指定集的实时观看人数"""
-    aid = request.args.get("aid", type=int)
-    cid = request.args.get("cid", type=int)
-    if not aid or not cid:
-        return jsonify({"code": -1, "message": "缺少 aid 或 cid 参数"})
-
-    cache_key = str(aid)
-    now = time.time()
-    if cache_key in _cache["realtime"] and now - _cache["realtime"][cache_key]["time"] < 20:
-        count = _cache["realtime"][cache_key]["count"]
-    else:
+    @app.route("/api/realtime")
+    def get_realtime():
+        aid = request.args.get("aid", type=int)
+        cid = request.args.get("cid", type=int)
+        if not aid or not cid:
+            return jsonify({"code": -1, "message": "缺少 aid 或 cid 参数"})
+        key = f"rt:{aid}"
+        cached, hit = store.get(key)
+        if hit:
+            return jsonify({"code": 0, "data": {"aid": aid, "cid": cid,
+                                                "count": cached}})
         result = api.get_realtime_online(aid, cid)
         if result.get("code") != 0:
-            return jsonify({"code": -1, "message": result.get("message", "获取失败")})
-        data = result.get("data", {})
-        count = int(data.get("total", 0))
-        _cache["realtime"][cache_key] = {"count": count, "time": now}
+            return jsonify({"code": -1,
+                            "message": result.get("message", "获取失败")})
+        count = int(result.get("data", {}).get("total", 0))
+        store.set(key, count, REALTIME_TTL)
+        store.append_trend(aid, count)
+        _schedule_save()
+        return jsonify({"code": 0, "data": {"aid": aid, "cid": cid,
+                                            "count": count}})
 
-        if cache_key not in _cache["trend"]:
-            _cache["trend"][cache_key] = []
-        trend_list = _cache["trend"][cache_key]
-        trend_list.append({"count": count, "time": int(now)})
-        if len(trend_list) > HISTORY_TREND_MAX:
-            trend_list.pop(0)
-        threading.Thread(target=save_trend_data, daemon=True).start()
+    @app.route("/api/overview")
+    def get_overview():
+        cached, hit = store.get("overview")
+        if hit:
+            return jsonify({"code": 0, "data": cached})
+        overview = api.get_overview()
+        if not overview:
+            return jsonify({"code": -1, "message": "上游接口不可用，请稍后重试"})
+        store.set("overview", overview, OVERVIEW_TTL)
+        return jsonify({"code": 0, "data": overview})
 
-    return jsonify({"code": 0, "data": {"aid": aid, "cid": cid, "count": count}})
+    @app.route("/api/trend")
+    def get_trend():
+        aid = request.args.get("aid", "")
+        return jsonify({"code": 0, "data": store.get_trend(aid)})
 
+    @app.route("/api/episode_stat")
+    def get_episode_stat_route():
+        aid = request.args.get("aid", type=int)
+        if not aid:
+            return jsonify({"code": -1, "message": "缺少 aid 参数"})
+        stat, hit = store.get_stat(aid)
+        if hit:
+            if stat:
+                return jsonify({"code": 0, "data": stat})
+            return jsonify({"code": -1, "message": "上游暂时无数据，稍后自动重试"})
+        stat = api.get_episode_stat(aid)
+        store.set_stat(aid, stat)
+        _schedule_save()
+        if not stat:
+            return jsonify({"code": -1, "message": "获取统计失败，稍后自动重试"})
+        return jsonify({"code": 0, "data": stat})
 
-@app.route("/api/overview")
-def get_overview():
-    """获取总览数据（缓存 5 分钟）"""
-    now = time.time()
-    if _cache["overview"] and now - _cache["overview_time"] < 300:
-        return jsonify({"code": 0, "data": _cache["overview"]})
+    @app.route("/api/episode_stats_batch")
+    def get_episode_stats_batch():
+        aids_raw = request.args.get("aids", "")
+        try:
+            aid_list = [int(x) for x in aids_raw.split(",") if x.strip()]
+        except ValueError:
+            return jsonify({"code": -1, "message": "aids 参数格式错误"})
+        if not aid_list:
+            return jsonify({"code": -1, "message": "缺少 aids 参数"})
+        aid_list = aid_list[:BATCH_AID_LIMIT]
 
-    overview = api.get_overview()
-    _cache["overview"] = overview
-    _cache["overview_time"] = now
-    return jsonify({"code": 0, "data": overview})
+        results = {}
+        to_fetch = []
+        for aid in aid_list:
+            s, hit = store.get_stat(aid)
+            if hit:
+                results[str(aid)] = s
+            else:
+                to_fetch.append(aid)
 
+        if to_fetch:
+            fetched = api.get_episode_stats_concurrent(
+                to_fetch, workers=BATCH_WORKERS)
+            for aid_s, stat in fetched.items():
+                store.set_stat(int(aid_s), stat or {})
+                results[aid_s] = stat
+            _schedule_save()
 
-@app.route("/api/trend")
-def get_trend():
-    aid = request.args.get("aid", "")
-    trend_data = _cache["trend"].get(aid, [])
-    return jsonify({"code": 0, "data": trend_data})
+        return jsonify({"code": 0, "data": results})
 
+    @app.route("/img_proxy")
+    def img_proxy():
+        url = request.args.get("url", "")
+        if not url or "hdslb.com" not in url:
+            return Response("Invalid URL", status=400)
+        result = img_cache.fetch_cached(url)
+        if not result:
+            return Response("Proxy error", status=502)
+        content, mime = result
+        return Response(content, content_type=mime,
+                        headers={"Cache-Control": "public, max-age=604800"})
 
-@app.route("/api/episode_stat")
-def get_episode_stat():
-    """获取单集详细统计（缓存 10 分钟）"""
-    aid = request.args.get("aid", type=int)
-    if not aid:
-        return jsonify({"code": -1, "message": "缺少 aid 参数"})
-
-    now = time.time()
-    cache_key = str(aid)
-    if cache_key in _cache["ep_stat"] and now - _cache["ep_stat_time"].get(cache_key, 0) < 600:
-        return jsonify({"code": 0, "data": _cache["ep_stat"][cache_key]})
-
-    stat = api.get_episode_stat(aid)
-    _cache["ep_stat"][cache_key] = stat
-    _cache["ep_stat_time"][cache_key] = now
-    return jsonify({"code": 0, "data": stat})
-
-
-@app.route("/api/episode_stats_batch")
-def get_episode_stats_batch():
-    """批量获取多集统计（缓存 10 分钟，带重试）"""
-    aids = request.args.get("aids", "")
-    if not aids:
-        return jsonify({"code": -1, "message": "缺少 aids 参数"})
-
-    aid_list = [int(x) for x in aids.split(",") if x.strip()]
-    now = time.time()
-    results = {}
-    to_fetch = []
-
-    for aid in aid_list:
-        cache_key = str(aid)
-        if cache_key in _cache["ep_stat"] and now - _cache["ep_stat_time"].get(cache_key, 0) < 600:
-            results[aid] = _cache["ep_stat"][cache_key]
-        else:
-            to_fetch.append(aid)
-
-    # 带重试的逐个获取
-    for aid in to_fetch:
-        for attempt in range(2):
-            stat = api.get_episode_stat(aid)
-            if stat and stat.get("view") is not None:
-                break
-            time.sleep(0.1)
-        _cache["ep_stat"][str(aid)] = stat
-        _cache["ep_stat_time"][str(aid)] = now
-        results[aid] = stat
-
-    return jsonify({"code": 0, "data": results})
+    return app
 
 
-# ===== 图片代理（解决 B站防盗链） =====
-@app.route("/img_proxy")
-def img_proxy():
-    """代理 B站图片，解决浏览器防盗链问题"""
-    url = request.args.get("url", "")
-    if not url or "hdslb.com" not in url:
-        return Response("Invalid URL", status=400)
+def main():
+    store.load()
+    app = create_app()
 
-    try:
-        headers = {
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
-            "Referer": "https://www.bilibili.com",
-        }
-        resp = req.get(url, headers=headers, timeout=10, stream=True)
-        return Response(
-            resp.content,
-            content_type=resp.headers.get("Content-Type", "image/jpeg"),
-            headers={"Cache-Control": "public, max-age=86400"}
-        )
-    except Exception as e:
-        print(f"[IMG_PROXY] 代理失败: {e}")
-        return Response("Proxy error", status=502)
+    def _sample_latest():
+        eps = ensure_episodes()
+        if not eps:
+            return
+        latest = max(eps, key=lambda e: e.get("pub_time") or 0)
+        res = api.get_realtime_online(latest["aid"], latest["cid"])
+        if res.get("code") != 0:
+            return
+        count = int(res.get("data", {}).get("total", 0))
+        store.append_trend(latest["aid"], count)
+
+    sampler.start(_sample_latest, SAMPLER_INTERVAL, name="实时采样")
+
+    print("=" * 50)
+    print(f"  凡人修仙传 · B站实时数据监控")
+    print(f"  访问 http://localhost:{PORT}")
+    print("=" * 50)
+    app.run(host=HOST, port=PORT, debug=DEBUG, threaded=True)
 
 
 if __name__ == "__main__":
-    print("=" * 50)
-    print("  凡人修仙传 · B站实时数据监控")
-    print("  访问 http://localhost:5000")
-    print("=" * 50)
-    app.run(host="0.0.0.0", port=5000, debug=True)
+    main()

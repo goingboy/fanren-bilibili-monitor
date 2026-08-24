@@ -1,14 +1,12 @@
-"""
-哔哩哔哩 API 封装模块
-实现 WBI 签名、番剧信息获取、实时观看人数查询
-"""
+"""哔哩哔哩 API 封装：WBI 签名、番剧信息、单集统计、实时人数、并发批量"""
 import hashlib
+import threading
 import time
 import urllib.parse
-from functools import lru_cache
+from concurrent.futures import ThreadPoolExecutor
+
 import requests
 
-# WBI 混淆密钥表
 MIXIN_KEY_ENC_TAB = [
     46, 47, 18, 2, 53, 8, 23, 32, 15, 50, 10, 31, 58, 3, 45, 35,
     27, 43, 5, 49, 33, 9, 42, 19, 29, 28, 14, 39, 12, 38, 41, 13,
@@ -22,14 +20,20 @@ HEADERS = {
     "Referer": "https://www.bilibili.com",
 }
 
-# 凡人修仙传 season_id = 28747（包含全部 272 集）
+# 凡人修仙传 season_id = 28747
 FANREN_SEASONS = [
     {"season_id": 28747, "title": "凡人修仙传", "alias": "凡人修仙传"},
 ]
 
+# season stat 复数 -> 单数映射；未列出的字段原样透传（如 follow）
+_STAT_MAP = {
+    "views": "view", "danmakus": "danmaku", "coins": "coin",
+    "likes": "like", "favorites": "favorite", "reply": "reply",
+    "share": "share",
+}
+
 
 def get_mixin_key(orig: str) -> str:
-    """从 img_key + sub_key 生成 mixin_key"""
     return "".join([orig[i] for i in MIXIN_KEY_ENC_TAB])[:32]
 
 
@@ -37,103 +41,80 @@ class BilibiliAPI:
     def __init__(self):
         self.session = requests.Session()
         self.session.headers.update(HEADERS)
-        self._img_key = ""
-        self._sub_key = ""
+        self._key_lock = threading.Lock()
         self._mixin_key = ""
         self._key_update_time = 0
 
+    # ---- WBI ----
     def _update_wbi_keys(self):
-        """获取并更新 WBI 密钥（每 30 分钟刷新一次）"""
         now = time.time()
-        if now - self._key_update_time < 1800 and self._mixin_key:
-            return
-        try:
-            resp = self.session.get(
-                "https://api.bilibili.com/x/web-interface/nav",
-                timeout=10
-            )
-            data = resp.json().get("data", {})
-            wbi_img = data.get("wbi_img", {})
-            img_url = wbi_img.get("img_url", "")
-            sub_url = wbi_img.get("sub_url", "")
-            self._img_key = img_url.rsplit("/", 1)[-1].split(".")[0]
-            self._sub_key = sub_url.rsplit("/", 1)[-1].split(".")[0]
-            self._mixin_key = get_mixin_key(self._img_key + self._sub_key)
-            self._key_update_time = now
-        except Exception as e:
-            print(f"[WBI] 获取密钥失败: {e}")
+        with self._key_lock:
+            if self._mixin_key and now - self._key_update_time < 1800:
+                return
+            try:
+                resp = self.session.get(
+                    "https://api.bilibili.com/x/web-interface/nav", timeout=10)
+                wbi_img = resp.json().get("data", {}).get("wbi_img", {})
+                img_url = wbi_img.get("img_url", "")
+                sub_url = wbi_img.get("sub_url", "")
+                if img_url and sub_url:
+                    img_key = img_url.rsplit("/", 1)[-1].split(".")[0]
+                    sub_key = sub_url.rsplit("/", 1)[-1].split(".")[0]
+                    self._mixin_key = get_mixin_key(img_key + sub_key)
+                    self._key_update_time = now
+            except Exception as e:
+                print(f"[WBI] 获取密钥失败: {e}")
 
     def _sign_params(self, params: dict) -> dict:
-        """对参数进行 WBI 签名"""
         self._update_wbi_keys()
-        wts = str(int(time.time()))
-        params["wts"] = wts
-        # 按 key 排序
+        params["wts"] = str(int(time.time()))
         query = urllib.parse.urlencode(sorted(params.items()))
-        w_rid = hashlib.md5((query + self._mixin_key).encode()).hexdigest()
-        params["w_rid"] = w_rid
+        params["w_rid"] = hashlib.md5(
+            (query + self._mixin_key).encode()).hexdigest()
         return params
 
-    def get_season_info(self, season_id: int) -> dict:
-        """获取番剧季度信息和集数列表"""
+    # ---- 基础接口 ----
+    def _get_json(self, url, params=None):
         try:
-            resp = self.session.get(
-                "https://api.bilibili.com/pgc/view/web/season",
-                params={"season_id": season_id},
-                timeout=10
-            )
+            resp = self.session.get(url, params=params, timeout=10)
             return resp.json()
         except Exception as e:
-            print(f"[API] 获取季度信息失败: {e}")
+            print(f"[API] {url} 失败: {e}")
             return {"code": -1, "message": str(e)}
+
+    def get_season_info(self, season_id: int) -> dict:
+        return self._get_json(
+            "https://api.bilibili.com/pgc/view/web/season",
+            {"season_id": season_id})
 
     def get_episode_stat(self, aid: int) -> dict:
-        """获取单集详细统计（播放、弹幕、投币等）"""
-        try:
-            resp = self.session.get(
-                "https://api.bilibili.com/x/web-interface/view",
-                params={"aid": aid},
-                timeout=10
-            )
-            data = resp.json()
-            if data.get("code") == 0:
-                return data["data"].get("stat", {})
-            return {}
-        except Exception as e:
-            print(f"[API] 获取集统计失败 aid={aid}: {e}")
-            return {}
+        data = self._get_json(
+            "https://api.bilibili.com/x/web-interface/view", {"aid": aid})
+        if data.get("code") == 0:
+            return data.get("data", {}).get("stat", {}) or {}
+        return {}
 
     def get_realtime_online(self, aid: int, cid: int) -> dict:
-        """获取指定视频的实时在线观看人数"""
-        try:
-            resp = self.session.get(
-                "https://api.bilibili.com/x/player/online/total",
-                params={"aid": aid, "cid": cid},
-                timeout=10
-            )
-            return resp.json()
-        except Exception as e:
-            print(f"[API] 获取实时人数失败: {e}")
-            return {"code": -1, "message": str(e)}
+        return self._get_json(
+            "https://api.bilibili.com/x/player/online/total",
+            {"aid": aid, "cid": cid})
 
     def get_all_episodes(self) -> list:
-        """获取凡人修仙传所有季的全部集信息"""
         all_episodes = []
         for season in FANREN_SEASONS:
             data = self.get_season_info(season["season_id"])
             if data.get("code") != 0:
                 continue
             result = data.get("result", {})
-            episodes = result.get("episodes", [])
-            for ep in episodes:
+            for ep in result.get("episodes", []):
                 ep["season_title"] = season["title"]
                 ep["season_alias"] = season["alias"]
                 ep["season_id"] = season["season_id"]
-            all_episodes.extend(episodes)
+            all_episodes.extend(result.get("episodes", []))
         return all_episodes
 
     def get_overview(self) -> list:
-        """获取总览数据（季节级别的汇总统计）"""
+        """季节级汇总。stat 做复数->单数归一，未知字段原样保留。"""
         overview_list = []
         for season in FANREN_SEASONS:
             data = self.get_season_info(season["season_id"])
@@ -141,16 +122,14 @@ class BilibiliAPI:
                 continue
             result = data.get("result", {})
             raw_stat = result.get("stat", {})
-            # 将复数字段名映射为前端使用的单数字段名
-            normalized_stat = {
-                "view": raw_stat.get("views", 0),
-                "danmaku": raw_stat.get("danmakus", 0),
-                "coin": raw_stat.get("coins", 0),
-                "like": raw_stat.get("likes", 0),
-                "favorite": raw_stat.get("favorites", 0),
-                "reply": raw_stat.get("reply", 0),
-                "share": raw_stat.get("share", 0),
-            }
+            normalized_stat = {}
+            for src, dst in _STAT_MAP.items():
+                if src in raw_stat:
+                    normalized_stat[dst] = raw_stat[src]
+            for key, val in raw_stat.items():
+                if key not in _STAT_MAP and key not in normalized_stat \
+                        and not isinstance(val, (dict, list)):
+                    normalized_stat[key] = val
             overview_list.append({
                 "season_id": season["season_id"],
                 "title": season["title"],
@@ -163,6 +142,20 @@ class BilibiliAPI:
             })
         return overview_list
 
+    # ---- 并发批量统计 ----
+    def get_episode_stats_concurrent(self, aids, workers=6) -> dict:
+        """返回 {str(aid): stat_dict|None}，失败为 None"""
+        def _one(aid):
+            try:
+                return aid, self.get_episode_stat(aid)
+            except Exception:
+                return aid, {}
 
-# 全局单例
+        results = {}
+        with ThreadPoolExecutor(max_workers=max(1, workers)) as ex:
+            for aid, stat in ex.map(_one, aids):
+                results[str(aid)] = stat or None
+        return results
+
+
 api = BilibiliAPI()
