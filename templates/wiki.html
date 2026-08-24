@@ -1,0 +1,892 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>凡人修仙传 · 动画百科</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700;900&family=ZCOOL+XiaoWei&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="bg-overlay"></div>
+    <div class="floating-particles" id="particles"></div>
+
+    <header class="header">
+        <div class="header-inner">
+            <div class="logo-area">
+                <div class="logo-icon">
+                    <svg viewBox="0 0 60 60" class="taiji-icon">
+                        <circle cx="30" cy="30" r="28" fill="none" stroke="currentColor" stroke-width="2"/>
+                        <path d="M30 2 A28 28 0 0 1 30 58 A14 14 0 0 0 30 30 A14 14 0 0 1 30 2" fill="currentColor"/>
+                        <circle cx="30" cy="16" r="4" fill="var(--bg-dark)"/>
+                        <circle cx="30" cy="44" r="4" fill="currentColor"/>
+                    </svg>
+                </div>
+                <div class="logo-text">
+                    <h1>凡人修仙传</h1>
+                    <span class="subtitle">动画百科</span>
+                </div>
+            </div>
+            <nav class="nav-links">
+                <a href="/" class="nav-link">数据监控</a>
+                <a href="/wiki" class="nav-link active">动画百科</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="wiki-main">
+        <div class="wiki-hero">
+            <img src="/img_proxy?url=https://i0.hdslb.com/bfs/bangumi/image/0af10a0c3258186e96fde4406b384c13dd643d8f.png" alt="" class="wiki-hero-bg">
+            <div class="wiki-hero-overlay"></div>
+            <div class="wiki-hero-content">
+                <h2>凡人修仙传 · 百科全书</h2>
+                <p>修仙之路，道阻且长。此间万千法门，尽在此录。</p>
+            </div>
+        </div>
+
+        <!-- 分类标签 -->
+        <div class="wiki-tabs">
+            <button class="wiki-tab active" data-tab="characters">人物志</button>
+            <button class="wiki-tab" data-tab="realms">境界录</button>
+            <button class="wiki-tab" data-tab="items">法宝录</button>
+            <button class="wiki-tab" data-tab="pets">灵宠录</button>
+            <button class="wiki-tab" data-tab="formations">阵法录</button>
+            <button class="wiki-tab" data-tab="world">世界观</button>
+        </div>
+
+        <!-- 人物志 -->
+        <div class="wiki-tab-content active" id="tab-characters">
+            <div class="wiki-section-grid">
+                <!-- 韩立 -->
+                <div class="wiki-detail-card wiki-detail-wide">
+                    <div class="wiki-detail-header">
+                        <div class="wiki-detail-avatar" style="background:linear-gradient(135deg,#c9a96e,#8b6914)">韩</div>
+                        <div>
+                            <h3>韩立</h3>
+                            <span class="wiki-detail-subtitle">主角 · 凡人修仙</span>
+                        </div>
+                    </div>
+                    <div class="wiki-detail-body">
+                        <p>出身贫寒的山村少年，天资平庸却意志坚定。被墨大夫收入七玄门，凭借神秘小瓶催熟灵药的奇效和自身不懈努力，一步步从炼气期修炼至元婴期。性格沉稳内敛，处事谨慎，深谙"低调行事"之道。擅长以弱胜强，多次在绝境中化险为夷。</p>
+                        <div class="wiki-detail-tags">
+                            <span class="wiki-tag">小瓶</span>
+                            <span class="wiki-tag">青竹蜂云剑</span>
+                            <span class="wiki-tag">噬金虫</span>
+                            <span class="wiki-tag">七玄门</span>
+                            <span class="wiki-tag">黄枫谷</span>
+                        </div>
+                        <div class="wiki-detail-stats">
+                            <div class="wiki-stat-item"><span class="wiki-stat-label">境界</span><span class="wiki-stat-value">元婴期</span></div>
+                            <div class="wiki-stat-item"><span class="wiki-stat-label">功法</span><span class="wiki-stat-value">大衍诀</span></div>
+                            <div class="wiki-stat-item"><span class="wiki-stat-label">道侣</span><span class="wiki-stat-value">南宫婉</span></div>
+                            <div class="wiki-stat-item"><span class="wiki-stat-label">出身</span><span class="wiki-stat-value">镜州青牛镇</span></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 南宫婉 -->
+                <div class="wiki-detail-card">
+                    <div class="wiki-detail-header">
+                        <div class="wiki-detail-avatar" style="background:linear-gradient(135deg,#e63946,#a82030)">南</div>
+                        <div>
+                            <h3>南宫婉</h3>
+                            <span class="wiki-detail-subtitle">女主 · 掩月宗天才</span>
+                        </div>
+                    </div>
+                    <div class="wiki-detail-body">
+                        <p>掩月宗天才女修，容貌绝世，冰雪聪明。修炼素女功，修为精深。与韩立相识于血色禁地，二人经历生死磨难，互生情愫，最终结为道侣。性格外冷内热，对韩立深情不移。</p>
+                        <div class="wiki-detail-tags">
+                            <span class="wiki-tag">掩月宗</span>
+                            <span class="wiki-tag">素女功</span>
+                            <span class="wiki-tag">血色禁地</span>
+                        </div>
+                        <div class="wiki-detail-stats">
+                            <div class="wiki-stat-item"><span class="wiki-stat-label">境界</span><span class="wiki-stat-value">结丹期</span></div>
+                            <div class="wiki-stat-item"><span class="wiki-stat-label">门派</span><span class="wiki-stat-value">掩月宗</span></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 墨大夫 -->
+                <div class="wiki-detail-card">
+                    <div class="wiki-detail-header">
+                        <div class="wiki-detail-avatar" style="background:linear-gradient(135deg,#3a86ff,#1a4a9e)">墨</div>
+                        <div>
+                            <h3>墨大夫</h3>
+                            <span class="wiki-detail-subtitle">七玄门长老 · 韩立恩师</span>
+                        </div>
+                    </div>
+                    <div class="wiki-detail-body">
+                        <p>七玄门长老，韩立的启蒙恩师。当年亲自将韩立收入门下，传授基础功法和医术。虽修为不算顶尖，但为人正直，对韩立有知遇之恩。后因门派纷争，命运多舛。</p>
+                        <div class="wiki-detail-tags">
+                            <span class="wiki-tag">七玄门</span>
+                            <span class="wiki-tag">医术</span>
+                            <span class="wiki-tag">炼气期</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 厉飞雨 -->
+                <div class="wiki-detail-card">
+                    <div class="wiki-detail-header">
+                        <div class="wiki-detail-avatar" style="background:linear-gradient(135deg,#2ec4b6,#1a7a70)">厉</div>
+                        <div>
+                            <h3>厉飞雨</h3>
+                            <span class="wiki-detail-subtitle">七玄门挚友 · 患难之交</span>
+                        </div>
+                    </div>
+                    <div class="wiki-detail-body">
+                        <p>韩立在七玄门的挚友，性格豪爽直率，重情重义。二人共同修炼、并肩作战，经历诸多险境。后各奔前程，但交情深厚，多次在关键时刻出手相助。</p>
+                        <div class="wiki-detail-tags">
+                            <span class="wiki-tag">七玄门</span>
+                            <span class="wiki-tag">刀法</span>
+                            <span class="wiki-tag">义气</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 紫灵 -->
+                <div class="wiki-detail-card">
+                    <div class="wiki-detail-header">
+                        <div class="wiki-detail-avatar" style="background:linear-gradient(135deg,#f59e0b,#b45309)">紫</div>
+                        <div>
+                            <h3>紫灵仙子</h3>
+                            <span class="wiki-detail-subtitle">乱星海女修 · 韩立红颜</span>
+                        </div>
+                    </div>
+                    <div class="wiki-detail-body">
+                        <p>乱星海著名女修，容貌倾城，聪慧过人。与韩立在乱星海相识，多次合作闯荡秘境。性格独立坚强，对韩立暗生情愫，是韩立修仙路上重要的红颜知己。</p>
+                        <div class="wiki-detail-tags">
+                            <span class="wiki-tag">乱星海</span>
+                            <span class="wiki-tag">结丹期</span>
+                            <span class="wiki-tag">红颜知己</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 银月 -->
+                <div class="wiki-detail-card">
+                    <div class="wiki-detail-header">
+                        <div class="wiki-detail-avatar" style="background:linear-gradient(135deg,#8b5cf6,#5a2d9e)">银</div>
+                        <div>
+                            <h3>银月</h3>
+                            <span class="wiki-detail-subtitle">狼首玉如意器灵 · 天狼化形</span>
+                        </div>
+                    </div>
+                    <div class="wiki-detail-body">
+                        <p>天狼化形的器灵，寄居于狼首玉如意中，化神期修为。性格高傲但对韩立忠心耿耿，多次在危急时刻出手相助。后成为韩立的得力助手，与其并肩作战。</p>
+                        <div class="wiki-detail-tags">
+                            <span class="wiki-tag">天狼</span>
+                            <span class="wiki-tag">化神期</span>
+                            <span class="wiki-tag">器灵</span>
+                            <span class="wiki-tag">化形</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 陈巧倩 -->
+                <div class="wiki-detail-card">
+                    <div class="wiki-detail-header">
+                        <div class="wiki-detail-avatar" style="background:linear-gradient(135deg,#ec4899,#be185d)">陈</div>
+                        <div>
+                            <h3>陈巧倩</h3>
+                            <span class="wiki-detail-subtitle">黄枫谷女修 · 韩立同门</span>
+                        </div>
+                    </div>
+                    <div class="wiki-detail-body">
+                        <p>黄枫谷内门弟子，容貌秀丽，性格活泼。与韩立同门修炼，对他颇有好感。在门派中人缘极好，消息灵通，常为韩立提供情报。</p>
+                        <div class="wiki-detail-tags">
+                            <span class="wiki-tag">黄枫谷</span>
+                            <span class="wiki-tag">内门弟子</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 张铁 -->
+                <div class="wiki-detail-card">
+                    <div class="wiki-detail-header">
+                        <div class="wiki-detail-avatar" style="background:linear-gradient(135deg,#78716c,#44403c)">张</div>
+                        <div>
+                            <h3>张铁</h3>
+                            <span class="wiki-detail-subtitle">七玄门弟子 · 韩立同门</span>
+                        </div>
+                    </div>
+                    <div class="wiki-detail-body">
+                        <p>与韩立同期加入七玄门的弟子，性格憨厚老实。虽天资平平，但勤学苦练，与韩立关系不错。后因门派变故，命运各异。</p>
+                        <div class="wiki-detail-tags">
+                            <span class="wiki-tag">七玄门</span>
+                            <span class="wiki-tag">同期弟子</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 厉飞雨师父 -->
+                <div class="wiki-detail-card">
+                    <div class="wiki-detail-header">
+                        <div class="wiki-detail-avatar" style="background:linear-gradient(135deg,#0ea5e9,#0369a1)">钟</div>
+                        <div>
+                            <h3>钟卫天</h3>
+                            <span class="wiki-detail-subtitle">七玄门掌门 · 筑基修士</span>
+                        </div>
+                    </div>
+                    <div class="wiki-detail-body">
+                        <p>七玄门掌门，筑基期修士。统领门派事务，为人威严正直。在门派危难之际挺身而出，是七玄门的顶梁柱。</p>
+                        <div class="wiki-detail-tags">
+                            <span class="wiki-tag">七玄门</span>
+                            <span class="wiki-tag">掌门</span>
+                            <span class="wiki-tag">筑基期</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 境界录 -->
+        <div class="wiki-tab-content" id="tab-realms">
+            <div class="wiki-timeline">
+                <div class="wiki-timeline-item">
+                    <div class="wiki-timeline-dot" style="background:#4ade80"></div>
+                    <div class="wiki-timeline-card">
+                        <h3>炼气期 <span class="wiki-realm-ep">第1-25集</span></h3>
+                        <p>修仙之始，感应天地灵气，引气入体。分为一至十三层，每突破一层实力大增。韩立在此境界进入七玄门，领悟小瓶催熟灵药的奥秘，习得御风术、火球术等基础法术。</p>
+                        <div class="wiki-realm-abilities">
+                            <span class="wiki-ability">御风术</span>
+                            <span class="wiki-ability">火球术</span>
+                            <span class="wiki-ability">定神术</span>
+                            <span class="wiki-ability">神识探查</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="wiki-timeline-item">
+                    <div class="wiki-timeline-dot" style="background:#3a86ff"></div>
+                    <div class="wiki-timeline-card">
+                        <h3>筑基期 <span class="wiki-realm-ep">第26-65集</span></h3>
+                        <p>凝聚法力，筑就道基。寿元增至两百年，可御剑飞行，施展更强大的法术。韩立在此境界加入黄枫谷，参加血色禁地试炼，结识南宫婉，经历生死考验。</p>
+                        <div class="wiki-realm-abilities">
+                            <span class="wiki-ability">御剑术</span>
+                            <span class="wiki-ability">护体神光</span>
+                            <span class="wiki-ability">神识外放</span>
+                            <span class="wiki-ability">五行法术</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="wiki-timeline-item">
+                    <div class="wiki-timeline-dot" style="background:#c9a96e"></div>
+                    <div class="wiki-timeline-card">
+                        <h3>结丹期 <span class="wiki-realm-ep">第66-120集</span></h3>
+                        <p>法力凝聚为金丹，寿元五百年。金丹品质决定日后成就，可施展金丹神通，祭炼法宝。韩立在此境界炼制青竹蜂云剑，培育噬金虫，实力大增，开始涉足乱星海。</p>
+                        <div class="wiki-realm-abilities">
+                            <span class="wiki-ability">金丹神通</span>
+                            <span class="wiki-ability">法宝祭炼</span>
+                            <span class="wiki-ability">遁术</span>
+                            <span class="wiki-ability">剑阵</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="wiki-timeline-item">
+                    <div class="wiki-timeline-dot" style="background:#f0d78c"></div>
+                    <div class="wiki-timeline-card">
+                        <h3>元婴期 <span class="wiki-realm-ep">第121-176集</span></h3>
+                        <p>金丹孕育元婴，可元婴出窍，施展大挪移等空间神通。寿元千年，神通初成，已属修仙界高手之列。韩立在此境界纵横乱星海，与各大势力周旋，收服银月，实力突飞猛进。</p>
+                        <div class="wiki-realm-abilities">
+                            <span class="wiki-ability">元婴出窍</span>
+                            <span class="wiki-ability">大挪移</span>
+                            <span class="wiki-ability">领域压制</span>
+                            <span class="wiki-ability">元婴自爆</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="wiki-timeline-item">
+                    <div class="wiki-timeline-dot" style="background:#e63946"></div>
+                    <div class="wiki-timeline-card">
+                        <h3>化神期 <span class="wiki-realm-ep">第180-220集</span></h3>
+                        <p>元婴化为神识，掌控空间之力。寿元两千余年，已属修仙界顶尖存在。可开辟洞天，操纵天地元气，一念之间移山填海。</p>
+                        <div class="wiki-realm-abilities">
+                            <span class="wiki-ability">空间神通</span>
+                            <span class="wiki-ability">化神之域</span>
+                            <span class="wiki-ability">天地元气</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="wiki-timeline-item">
+                    <div class="wiki-timeline-dot" style="background:#8b5cf6"></div>
+                    <div class="wiki-timeline-card">
+                        <h3>合体期 <span class="wiki-realm-ep">第220-255集</span></h3>
+                        <p>天人合一，肉身与元婴合而为一。寿元五千余年，实力通天彻地。可操控天地法则，实力已臻化境。</p>
+                        <div class="wiki-realm-abilities">
+                            <span class="wiki-ability">天人合一</span>
+                            <span class="wiki-ability">法则之力</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="wiki-timeline-item">
+                    <div class="wiki-timeline-dot" style="background:#fbbf24"></div>
+                    <div class="wiki-timeline-card">
+                        <h3>大乘期 <span class="wiki-realm-ep">第255-272集</span></h3>
+                        <p>修仙界至高境界，寿元万年。窥探天道，掌握天地至理。大乘圆满后需渡过天劫，方可飞升仙界。</p>
+                        <div class="wiki-realm-abilities">
+                            <span class="wiki-ability">天劫</span>
+                            <span class="wiki-ability">飞升</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="wiki-timeline-item">
+                    <div class="wiki-timeline-dot" style="background:#fff"></div>
+                    <div class="wiki-timeline-card">
+                        <h3>飞升仙界</h3>
+                        <p>修仙之极致，渡过天劫飞升仙界。从此脱离凡尘，逍遥天地之间。韩立的终极目标。</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 法宝录 -->
+        <div class="wiki-tab-content" id="tab-items">
+            <div class="wiki-section-grid">
+                <!-- 神秘小瓶 -->
+                <div class="wiki-detail-card wiki-detail-wide">
+                    <div class="wiki-detail-header">
+                        <div class="wiki-detail-avatar" style="background:linear-gradient(135deg,#4ade80,#16a34a)">瓶</div>
+                        <div>
+                            <h3>神秘小瓶</h3>
+                            <span class="wiki-detail-subtitle">韩立至宝 · 来历不明</span>
+                        </div>
+                    </div>
+                    <div class="wiki-detail-body">
+                        <p>韩立偶然获得的神秘宝物，外观古朴，看似普通却蕴含不可思议之力。可催熟灵药、加速天材地宝生长，是韩立修仙路上最重要的依仗。正是凭借此瓶，韩立才能以平庸资质获得大量修炼资源。来历神秘，连韩立自己也不知其真正底细。</p>
+                        <div class="wiki-detail-tags">
+                            <span class="wiki-tag">催熟灵药</span>
+                            <span class="wiki-tag">神秘来历</span>
+                            <span class="wiki-tag">至宝</span>
+                            <span class="wiki-tag">不可交易</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 青竹蜂云剑 -->
+                <div class="wiki-detail-card">
+                    <div class="wiki-detail-header">
+                        <div class="wiki-detail-avatar" style="background:linear-gradient(135deg,#3a86ff,#1a4a9e)">剑</div>
+                        <div>
+                            <h3>青竹蜂云剑</h3>
+                            <span class="wiki-detail-subtitle">七十二口飞剑 · 成套法宝</span>
+                        </div>
+                    </div>
+                    <div class="wiki-detail-body">
+                        <p>韩立精心炼制的成套飞剑，共七十二口。以青竹为基，蜂云为锋，锋利无比。可组成青竹蜂云剑阵，七十二剑齐出，攻守兼备，威力随修为提升而增强。</p>
+                        <div class="wiki-detail-tags">
+                            <span class="wiki-tag">飞剑</span>
+                            <span class="wiki-tag">剑阵</span>
+                            <span class="wiki-tag">七十二口</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 狼首玉如意 -->
+                <div class="wiki-detail-card">
+                    <div class="wiki-detail-header">
+                        <div class="wiki-detail-avatar" style="background:linear-gradient(135deg,#8b5cf6,#5a2d9e)">玉</div>
+                        <div>
+                            <h3>狼首玉如意</h3>
+                            <span class="wiki-detail-subtitle">银月寄居 · 器灵法宝</span>
+                        </div>
+                    </div>
+                    <div class="wiki-detail-body">
+                        <p>内含天狼器灵银月的神秘法宝。玉如意温润如玉，却蕴含强大威能。银月寄居其中，可随时现身助战。此宝与韩立心神相连，随其修为增长而威力倍增。</p>
+                        <div class="wiki-detail-tags">
+                            <span class="wiki-tag">器灵</span>
+                            <span class="wiki-tag">银月</span>
+                            <span class="wiki-tag">天狼</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 照妖镜 -->
+                <div class="wiki-detail-card">
+                    <div class="wiki-detail-header">
+                        <div class="wiki-detail-avatar" style="background:linear-gradient(135deg,#f59e0b,#b45309)">镜</div>
+                        <div>
+                            <h3>照妖镜</h3>
+                            <span class="wiki-detail-subtitle">鉴真辨伪 · 辅助法宝</span>
+                        </div>
+                    </div>
+                    <div class="wiki-detail-body">
+                        <p>可照出妖物原形，破除幻术迷障。镜面光华流转，妖邪无所遁形。是修仙界常见的辅助法宝，对付幻术师和妖修尤为有效。</p>
+                        <div class="wiki-detail-tags">
+                            <span class="wiki-tag">破幻</span>
+                            <span class="wiki-tag">照妖</span>
+                            <span class="wiki-tag">辅助</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 混元钟 -->
+                <div class="wiki-detail-card">
+                    <div class="wiki-detail-header">
+                        <div class="wiki-detail-avatar" style="background:linear-gradient(135deg,#e63946,#a82030)">钟</div>
+                        <div>
+                            <h3>混元钟</h3>
+                            <span class="wiki-detail-subtitle">防御至宝 · 钟声护体</span>
+                        </div>
+                    </div>
+                    <div class="wiki-detail-body">
+                        <p>强大的防御法宝，钟身铭刻上古符文。钟声一响，万法不侵，可抵挡元婴期修士的全力一击。亦可发出音波攻击，震荡敌人心神。</p>
+                        <div class="wiki-detail-tags">
+                            <span class="wiki-tag">防御</span>
+                            <span class="wiki-tag">音攻</span>
+                            <span class="wiki-tag">符文</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 筑基丹 -->
+                <div class="wiki-detail-card">
+                    <div class="wiki-detail-header">
+                        <div class="wiki-detail-avatar" style="background:linear-gradient(135deg,#22c55e,#15803d)">丹</div>
+                        <div>
+                            <h3>筑基丹</h3>
+                            <span class="wiki-detail-subtitle">突破必备 · 稀世丹药</span>
+                        </div>
+                    </div>
+                    <div class="wiki-detail-body">
+                        <p>帮助炼气期修士突破至筑基期的珍贵丹药。炼制所需灵药极为稀有，寻常修士难以获得。韩立借助小瓶大量培育灵药，批量炼制筑基丹，实力飞速提升。</p>
+                        <div class="wiki-detail-tags">
+                            <span class="wiki-tag">丹药</span>
+                            <span class="wiki-tag">突破</span>
+                            <span class="wiki-tag">炼气→筑基</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 血色禁地令牌 -->
+                <div class="wiki-detail-card">
+                    <div class="wiki-detail-header">
+                        <div class="wiki-detail-avatar" style="background:linear-gradient(135deg,#dc2626,#991b1b)">令</div>
+                        <div>
+                            <h3>血色禁地令牌</h3>
+                            <span class="wiki-detail-subtitle">试炼凭证 · 限时开启</span>
+                        </div>
+                    </div>
+                    <div class="wiki-detail-body">
+                        <p>进入血色禁地试炼的凭证令牌。血色禁地每二十年开启一次，内有大量天材地宝，也有致命危险。各门派弟子持令牌入内争夺资源，生死各安天命。</p>
+                        <div class="wiki-detail-tags">
+                            <span class="wiki-tag">试炼</span>
+                            <span class="wiki-tag">血色禁地</span>
+                            <span class="wiki-tag">二十年一开</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 灵宠录 -->
+        <div class="wiki-tab-content" id="tab-pets">
+            <div class="wiki-section-grid">
+                <!-- 银月天狼 -->
+                <div class="wiki-detail-card wiki-detail-wide">
+                    <div class="wiki-detail-header">
+                        <div class="wiki-detail-avatar" style="background:linear-gradient(135deg,#c9a96e,#8b6914)">狼</div>
+                        <div>
+                            <h3>银月天狼</h3>
+                            <span class="wiki-detail-subtitle">化神期器灵 · 韩立最忠实的伙伴</span>
+                        </div>
+                    </div>
+                    <div class="wiki-detail-body">
+                        <p>天狼化形的器灵，寄居于狼首玉如意中。化神期修为，实力强大。性格高傲但对韩立忠心耿耿，多次在危急时刻出手相助。可化为天狼形态战斗，亦可化为人形与韩立并肩作战。是韩立修仙路上最重要的伙伴之一。</p>
+                        <div class="wiki-detail-tags">
+                            <span class="wiki-tag">天狼</span>
+                            <span class="wiki-tag">化神期</span>
+                            <span class="wiki-tag">器灵</span>
+                            <span class="wiki-tag">化形</span>
+                            <span class="wiki-tag">忠诚</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 噬金虫 -->
+                <div class="wiki-detail-card">
+                    <div class="wiki-detail-header">
+                        <div class="wiki-detail-avatar" style="background:linear-gradient(135deg,#2ec4b6,#1a7a70)">虫</div>
+                        <div>
+                            <h3>噬金虫</h3>
+                            <span class="wiki-detail-subtitle">上古异虫 · 无物不噬</span>
+                        </div>
+                    </div>
+                    <div class="wiki-detail-body">
+                        <p>上古异虫，以金属为食，无物不噬。韩立精心培育，使其实力不断增强。噬金虫群攻时铺天盖地，连法宝都能啃噬殆尽，是韩立重要的战斗手段。后进化为噬金王虫，威力更胜。</p>
+                        <div class="wiki-detail-tags">
+                            <span class="wiki-tag">异虫</span>
+                            <span class="wiki-tag">噬金</span>
+                            <span class="wiki-tag">群攻</span>
+                            <span class="wiki-tag">进化</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 墨蛟 -->
+                <div class="wiki-detail-card">
+                    <div class="wiki-detail-header">
+                        <div class="wiki-detail-avatar" style="background:linear-gradient(135deg,#e63946,#a82030)">蛟</div>
+                        <div>
+                            <h3>墨蛟</h3>
+                            <span class="wiki-detail-subtitle">结丹期灵兽 · 水属性</span>
+                        </div>
+                    </div>
+                    <div class="wiki-detail-body">
+                        <p>韩立在乱星海收服的灵兽，体型庞大，通体漆黑。水属性灵兽，擅长水中作战，实力不俗。性格暴躁但对韩立颇为畏惧，听从号令。</p>
+                        <div class="wiki-detail-tags">
+                            <span class="wiki-tag">蛟龙</span>
+                            <span class="wiki-tag">水属性</span>
+                            <span class="wiki-tag">乱星海</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 火灵虫 -->
+                <div class="wiki-detail-card">
+                    <div class="wiki-detail-header">
+                        <div class="wiki-detail-avatar" style="background:linear-gradient(135deg,#f97316,#c2410c)">火</div>
+                        <div>
+                            <h3>火灵虫</h3>
+                            <span class="wiki-detail-subtitle">火属性灵虫 · 群攻利器</span>
+                        </div>
+                    </div>
+                    <div class="wiki-detail-body">
+                        <p>火属性灵虫，通体赤红，温度极高。成群结队时可形成火海，焚烧一切。韩立在秘境中获得，后精心培育，成为又一战斗手段。</p>
+                        <div class="wiki-detail-tags">
+                            <span class="wiki-tag">火属性</span>
+                            <span class="wiki-tag">群攻</span>
+                            <span class="wiki-tag">灵虫</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 六翼霜蚣 -->
+                <div class="wiki-detail-card">
+                    <div class="wiki-detail-header">
+                        <div class="wiki-detail-avatar" style="background:linear-gradient(135deg,#67e8f9,#0891b2)">蚣</div>
+                        <div>
+                            <h3>六翼霜蚣</h3>
+                            <span class="wiki-detail-subtitle">冰属性异虫 · 极寒之体</span>
+                        </div>
+                    </div>
+                    <div class="wiki-detail-body">
+                        <p>冰属性异虫，生有六翼，通体晶莹如冰。所过之处寒气逼人，可冻结万物。韩立在极寒之地获得，是克制火属性修士的利器。</p>
+                        <div class="wiki-detail-tags">
+                            <span class="wiki-tag">冰属性</span>
+                            <span class="wiki-tag">六翼</span>
+                            <span class="wiki-tag">极寒</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 阵法录 -->
+        <div class="wiki-tab-content" id="tab-formations">
+            <div class="wiki-section-grid">
+                <!-- 大五行须弥禁法 -->
+                <div class="wiki-detail-card wiki-detail-wide">
+                    <div class="wiki-detail-header">
+                        <div class="wiki-detail-avatar" style="background:linear-gradient(135deg,#f0d78c,#8b6914)">阵</div>
+                        <div>
+                            <h3>大五行须弥禁法</h3>
+                            <span class="wiki-detail-subtitle">上古大阵 · 五行封印</span>
+                        </div>
+                    </div>
+                    <div class="wiki-detail-body">
+                        <p>上古封印大阵，以金木水火土五行之力构建须弥空间。阵法运转时五行相生相克，形成封印之力。可封印强大存在，破解之法极为困难，需同时精通五行法术。</p>
+                        <div class="wiki-detail-tags">
+                            <span class="wiki-tag">五行</span>
+                            <span class="wiki-tag">封印</span>
+                            <span class="wiki-tag">上古</span>
+                            <span class="wiki-tag">须弥空间</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 青竹蜂云剑阵 -->
+                <div class="wiki-detail-card">
+                    <div class="wiki-detail-header">
+                        <div class="wiki-detail-avatar" style="background:linear-gradient(135deg,#3a86ff,#1a4a9e)">剑</div>
+                        <div>
+                            <h3>青竹蜂云剑阵</h3>
+                            <span class="wiki-detail-subtitle">七十二剑阵 · 攻守兼备</span>
+                        </div>
+                    </div>
+                    <div class="wiki-detail-body">
+                        <p>以七十二口青竹蜂云剑组成的剑阵，攻守兼备。剑阵运转时剑气纵横，可攻可守。威力随韩立修为提升而增强，是韩立的招牌战技。</p>
+                        <div class="wiki-detail-tags">
+                            <span class="wiki-tag">剑阵</span>
+                            <span class="wiki-tag">攻伐</span>
+                            <span class="wiki-tag">七十二剑</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 迷天阵 -->
+                <div class="wiki-detail-card">
+                    <div class="wiki-detail-header">
+                        <div class="wiki-detail-avatar" style="background:linear-gradient(135deg,#8b5cf6,#5a2d9e)">迷</div>
+                        <div>
+                            <h3>迷天阵</h3>
+                            <span class="wiki-detail-subtitle">幻术大阵 · 困敌于无形</span>
+                        </div>
+                    </div>
+                    <div class="wiki-detail-body">
+                        <p>以幻术为主的困敌大阵，陷入其中者难辨东西，如坠五里雾中。阵法可随布阵者心意变化，令人防不胜破。不攻自破者众。</p>
+                        <div class="wiki-detail-tags">
+                            <span class="wiki-tag">幻术</span>
+                            <span class="wiki-tag">困敌</span>
+                            <span class="wiki-tag">迷阵</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 四象阵 -->
+                <div class="wiki-detail-card">
+                    <div class="wiki-detail-header">
+                        <div class="wiki-detail-avatar" style="background:linear-gradient(135deg,#f59e0b,#b45309)">象</div>
+                        <div>
+                            <h3>四象阵</h3>
+                            <span class="wiki-detail-subtitle">四灵守护 · 防御大阵</span>
+                        </div>
+                    </div>
+                    <div class="wiki-detail-body">
+                        <p>以青龙、白虎、朱雀、玄武四灵之力构建的防御大阵。四灵各守一方，相互呼应，形成铜墙铁壁般的防御。常用于守护重要洞府。</p>
+                        <div class="wiki-detail-tags">
+                            <span class="wiki-tag">四灵</span>
+                            <span class="wiki-tag">防御</span>
+                            <span class="wiki-tag">守护</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 九宫八卦阵 -->
+                <div class="wiki-detail-card">
+                    <div class="wiki-detail-header">
+                        <div class="wiki-detail-avatar" style="background:linear-gradient(135deg,#22c55e,#15803d)">卦</div>
+                        <div>
+                            <h3>九宫八卦阵</h3>
+                            <span class="wiki-detail-subtitle">八卦推演 · 变化无穷</span>
+                        </div>
+                    </div>
+                    <div class="wiki-detail-body">
+                        <p>以九宫八卦之理构建的阵法，变化无穷，令人难以捉摸。阵中暗藏杀机，亦可化为迷阵困敌。需精通易理方可布阵。</p>
+                        <div class="wiki-detail-tags">
+                            <span class="wiki-tag">八卦</span>
+                            <span class="wiki-tag">九宫</span>
+                            <span class="wiki-tag">变化</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 聚灵阵 -->
+                <div class="wiki-detail-card">
+                    <div class="wiki-detail-header">
+                        <div class="wiki-detail-avatar" style="background:linear-gradient(135deg,#0ea5e9,#0369a1)">聚</div>
+                        <div>
+                            <h3>聚灵阵</h3>
+                            <span class="wiki-detail-subtitle">聚集灵气 · 修炼辅助</span>
+                        </div>
+                    </div>
+                    <div class="wiki-detail-body">
+                        <p>修仙界最基础的阵法之一，可聚集周围天地灵气，提升修炼效率。品阶越高，聚灵效果越强。韩立常用此阵配合小瓶催熟灵药。</p>
+                        <div class="wiki-detail-tags">
+                            <span class="wiki-tag">聚灵</span>
+                            <span class="wiki-tag">修炼</span>
+                            <span class="wiki-tag">基础阵法</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 世界观 -->
+        <div class="wiki-tab-content" id="tab-world">
+            <div class="wiki-section-grid">
+                <!-- 修仙界总览 -->
+                <div class="wiki-detail-card wiki-detail-wide">
+                    <div class="wiki-detail-header">
+                        <div class="wiki-detail-avatar" style="background:linear-gradient(135deg,#c9a96e,#8b6914)">界</div>
+                        <div>
+                            <h3>修仙界总览</h3>
+                            <span class="wiki-detail-subtitle">凡人修仙传世界</span>
+                        </div>
+                    </div>
+                    <div class="wiki-detail-body">
+                        <p>凡人修仙传的世界由凡人界、灵界、仙界三大界面组成。凡人界修士通过不断修炼，突破境界，最终飞升灵界乃至仙界。修仙界以实力为尊，境界高低决定地位。各门派林立，资源争夺激烈，弱肉强食是不变的法则。</p>
+                    </div>
+                </div>
+
+                <!-- 七玄门 -->
+                <div class="wiki-detail-card">
+                    <div class="wiki-detail-header">
+                        <div class="wiki-detail-avatar" style="background:linear-gradient(135deg,#2ec4b6,#1a7a70)">七</div>
+                        <div>
+                            <h3>七玄门</h3>
+                            <span class="wiki-detail-subtitle">镜州小派 · 韩立出身</span>
+                        </div>
+                    </div>
+                    <div class="wiki-detail-body">
+                        <p>韩立最初加入的江湖小门派，位于镜州青牛镇附近。规模不大，以医术和基础功法见长。虽非修仙界顶尖势力，但韩立在此打下修仙基础，学会低调行事的生存之道。</p>
+                        <div class="wiki-detail-tags">
+                            <span class="wiki-tag">镜州</span>
+                            <span class="wiki-tag">小门派</span>
+                            <span class="wiki-tag">医术</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 黄枫谷 -->
+                <div class="wiki-detail-card">
+                    <div class="wiki-detail-header">
+                        <div class="wiki-detail-avatar" style="background:linear-gradient(135deg,#f59e0b,#b45309)">黄</div>
+                        <div>
+                            <h3>黄枫谷</h3>
+                            <span class="wiki-detail-subtitle">越国七大派之一</span>
+                        </div>
+                    </div>
+                    <div class="wiki-detail-body">
+                        <p>越国七大修仙门派之一，韩立筑基后加入。门内高手如云，资源丰富，竞争激烈。韩立在此获得更多修炼资源和历练机会，实力突飞猛进。</p>
+                        <div class="wiki-detail-tags">
+                            <span class="wiki-tag">越国</span>
+                            <span class="wiki-tag">七大派</span>
+                            <span class="wiki-tag">筑基</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 掩月宗 -->
+                <div class="wiki-detail-card">
+                    <div class="wiki-detail-header">
+                        <div class="wiki-detail-avatar" style="background:linear-gradient(135deg,#ec4899,#be185d)">掩</div>
+                        <div>
+                            <h3>掩月宗</h3>
+                            <span class="wiki-detail-subtitle">女修宗门 · 南宫婉出身</span>
+                        </div>
+                    </div>
+                    <div class="wiki-detail-body">
+                        <p>以女修为主的修仙宗门，功法独特，擅长幻术和冰属性法术。南宫婉即出身于此。门规森严，弟子众多，在修仙界有一定地位。</p>
+                        <div class="wiki-detail-tags">
+                            <span class="wiki-tag">女修</span>
+                            <span class="wiki-tag">幻术</span>
+                            <span class="wiki-tag">冰属性</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 乱星海 -->
+                <div class="wiki-detail-card">
+                    <div class="wiki-detail-header">
+                        <div class="wiki-detail-avatar" style="background:linear-gradient(135deg,#3a86ff,#1a4a9e)">乱</div>
+                        <div>
+                            <h3>乱星海</h3>
+                            <span class="wiki-detail-subtitle">海外修仙界 · 机缘与危险并存</span>
+                        </div>
+                    </div>
+                    <div class="wiki-detail-body">
+                        <p>远离大陆的海外修仙界，岛屿星罗棋布，势力林立。资源丰富但竞争残酷，各路修士在此争夺天材地宝。韩立在此境界大进，纵横驰骋，收服诸多灵兽，炼制重要法宝。</p>
+                        <div class="wiki-detail-tags">
+                            <span class="wiki-tag">海外</span>
+                            <span class="wiki-tag">岛屿</span>
+                            <span class="wiki-tag">争夺</span>
+                            <span class="wiki-tag">机缘</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 血色禁地 -->
+                <div class="wiki-detail-card">
+                    <div class="wiki-detail-header">
+                        <div class="wiki-detail-avatar" style="background:linear-gradient(135deg,#dc2626,#991b1b)">血</div>
+                        <div>
+                            <h3>血色禁地</h3>
+                            <span class="wiki-detail-subtitle">二十年一开 · 生死试炼场</span>
+                        </div>
+                    </div>
+                    <div class="wiki-detail-body">
+                        <p>神秘的试炼之地，每二十年开启一次。内有大量天材地宝和上古遗迹，也有致命的妖兽和陷阱。各门派弟子持令牌入内争夺资源，生死各安天命。韩立与南宫婉即在此相识。</p>
+                        <div class="wiki-detail-tags">
+                            <span class="wiki-tag">试炼</span>
+                            <span class="wiki-tag">二十年</span>
+                            <span class="wiki-tag">天材地宝</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 凡人界 -->
+                <div class="wiki-detail-card">
+                    <div class="wiki-detail-header">
+                        <div class="wiki-detail-avatar" style="background:linear-gradient(135deg,#78716c,#44403c)">凡</div>
+                        <div>
+                            <h3>凡人界</h3>
+                            <span class="wiki-detail-subtitle">修士起步之地</span>
+                        </div>
+                    </div>
+                    <div class="wiki-detail-body">
+                        <p>修仙世界的底层界面，灵气稀薄，修士境界普遍不高。凡人在此艰难求存，修士在此打下基础。韩立从此界起步，一步步走向更高的修仙境界。</p>
+                        <div class="wiki-detail-tags">
+                            <span class="wiki-tag">凡人</span>
+                            <span class="wiki-tag">灵气稀薄</span>
+                            <span class="wiki-tag">起步</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 灵界 -->
+                <div class="wiki-detail-card">
+                    <div class="wiki-detail-header">
+                        <div class="wiki-detail-avatar" style="background:linear-gradient(135deg,#a78bfa,#7c3aed)">灵</div>
+                        <div>
+                            <h3>灵界</h3>
+                            <span class="wiki-detail-subtitle">更高层次的修仙界面</span>
+                        </div>
+                    </div>
+                    <div class="wiki-detail-body">
+                        <p>比凡人界更高层次的修仙界面，灵气充裕，资源丰富。强者如林，竞争更加残酷。凡人界修士飞升后可进入灵界继续修炼。</p>
+                        <div class="wiki-detail-tags">
+                            <span class="wiki-tag">灵气充裕</span>
+                            <span class="wiki-tag">强者如林</span>
+                            <span class="wiki-tag">飞升</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="footer-inner">
+            <p>凡人修仙传 · 动画百科 | 数据来源：哔哩哔哩</p>
+            <p class="footer-quote">「大道三千，各有缘法。」</p>
+        </div>
+    </footer>
+
+    <script>
+        // 粒子
+        (function() {
+            const c = document.getElementById('particles');
+            for (let i = 0; i < 20; i++) {
+                const p = document.createElement('div');
+                p.className = 'particle';
+                p.style.left = Math.random()*100+'%';
+                p.style.animationDuration = (8+Math.random()*15)+'s';
+                p.style.animationDelay = Math.random()*10+'s';
+                p.style.width = p.style.height = (1+Math.random()*3)+'px';
+                c.appendChild(p);
+            }
+        })();
+
+        // 标签切换
+        document.querySelectorAll('.wiki-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.wiki-tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.wiki-tab-content').forEach(c => c.classList.remove('active'));
+                tab.classList.add('active');
+                document.getElementById('tab-' + tab.dataset.tab).classList.add('active');
+            });
+        });
+    </script>
+</body>
+</html>
