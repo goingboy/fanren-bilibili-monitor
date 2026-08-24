@@ -1,46 +1,25 @@
-<!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>凡人修仙传 · 动画百科</title>
-    <link rel="stylesheet" href="/static/css/style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700;900&family=ZCOOL+XiaoWei&display=swap" rel="stylesheet">
-</head>
-<body>
-    <div class="bg-overlay"></div>
-    <div class="floating-particles" id="particles"></div>
+{% extends "base.html" %}
 
-    <header class="header">
-        <div class="header-inner">
-            <div class="logo-area">
-                <div class="logo-icon">
-                    <svg viewBox="0 0 60 60" class="taiji-icon">
-                        <circle cx="30" cy="30" r="28" fill="none" stroke="currentColor" stroke-width="2"/>
-                        <path d="M30 2 A28 28 0 0 1 30 58 A14 14 0 0 0 30 30 A14 14 0 0 1 30 2" fill="currentColor"/>
-                        <circle cx="30" cy="16" r="4" fill="var(--bg-dark)"/>
-                        <circle cx="30" cy="44" r="4" fill="currentColor"/>
-                    </svg>
-                </div>
-                <div class="logo-text">
-                    <h1>凡人修仙传</h1>
-                    <span class="subtitle">动画百科</span>
-                </div>
-            </div>
-            <nav class="nav-links">
-                <a href="/" class="nav-link">数据监控</a>
-                <a href="/wiki" class="nav-link active">动画百科</a>
-            </nav>
-        </div>
-    </header>
+{% block title %}凡人修仙传 · 动画百科{% endblock %}
+{% block subtitle %}动画百科{% endblock %}
+{% block footer_quote %}「大道三千，各有缘法。」{% endblock %}
 
-    <main class="wiki-main">
+{% block content %}
+<main class="wiki-main">
         <div class="wiki-hero">
             <img src="/img_proxy?url=https://i0.hdslb.com/bfs/bangumi/image/0af10a0c3258186e96fde4406b384c13dd643d8f.png" alt="" class="wiki-hero-bg">
             <div class="wiki-hero-overlay"></div>
             <div class="wiki-hero-content">
                 <h2>凡人修仙传 · 百科全书</h2>
                 <p>修仙之路，道阻且长。此间万千法门，尽在此录。</p>
+            </div>
+        </div>
+
+        <!-- 全文搜索 -->
+        <div class="wiki-searchbar">
+            <div class="search-box">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+                <input type="search" id="wikiSearch" placeholder="搜索人物、法宝、境界、地点…" aria-label="搜索百科条目">
             </div>
         </div>
 
@@ -855,38 +834,9 @@
             </div>
         </div>
     </main>
+{% endblock %}
 
-    <footer class="footer">
-        <div class="footer-inner">
-            <p>凡人修仙传 · 动画百科 | 数据来源：哔哩哔哩</p>
-            <p class="footer-quote">「大道三千，各有缘法。」</p>
-        </div>
-    </footer>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/wiki.js') }}"></script>
+{% endblock %}
 
-    <script>
-        // 粒子
-        (function() {
-            const c = document.getElementById('particles');
-            for (let i = 0; i < 20; i++) {
-                const p = document.createElement('div');
-                p.className = 'particle';
-                p.style.left = Math.random()*100+'%';
-                p.style.animationDuration = (8+Math.random()*15)+'s';
-                p.style.animationDelay = Math.random()*10+'s';
-                p.style.width = p.style.height = (1+Math.random()*3)+'px';
-                c.appendChild(p);
-            }
-        })();
-
-        // 标签切换
-        document.querySelectorAll('.wiki-tab').forEach(tab => {
-            tab.addEventListener('click', () => {
-                document.querySelectorAll('.wiki-tab').forEach(t => t.classList.remove('active'));
-                document.querySelectorAll('.wiki-tab-content').forEach(c => c.classList.remove('active'));
-                tab.classList.add('active');
-                document.getElementById('tab-' + tab.dataset.tab).classList.add('active');
-            });
-        });
-    </script>
-</body>
-</html>

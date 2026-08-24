@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}凡人修仙传 · B站实时数据监控{% endblock %}</title>
+    <meta name="description" content="凡人修仙传动画 B站播放、弹幕、实时观看人数数据监控">
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%23b03a2e'/%3E%3Ctext x='16' y='23' font-size='17' text-anchor='middle' fill='%23f5f1e8' font-family='serif'%3E%E5%87%A1%3C/text%3E%3C/svg%3E">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700;900&family=ZCOOL+XiaoWei&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/tokens.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/pages.css') }}">
+    {% block head %}{% endblock %}
+</head>
+<body>
+    <div class="ink-breath" aria-hidden="true"></div>
+    <div class="bg-mountains" aria-hidden="true">
+        <svg viewBox="0 0 1440 320" preserveAspectRatio="xMidYMax slice">
+            <path class="m-back" d="M0,258 C170,190 260,225 430,168 C600,112 680,208 850,152 C1020,96 1130,196 1290,142 C1370,116 1425,168 1440,158 L1440,320 L0,320 Z"/>
+            <path class="m-front" d="M0,286 C200,232 300,268 480,224 C660,180 740,252 920,212 C1100,172 1220,244 1360,214 C1410,204 1432,222 1440,218 L1440,320 L0,320 Z"/>
+        </svg>
+    </div>
+
+    <header class="site-header">
+        <div class="header-inner">
+            <a href="/" class="logo-area" aria-label="返回首页">
+                <span class="logo-seal" aria-hidden="true">凡</span>
+                <span class="logo-text">
+                    <h1>凡人修仙传</h1>
+                    <span class="subtitle">{% block subtitle %}B站实时数据监控{% endblock %}</span>
+                </span>
+            </a>
+            <nav class="nav-links" aria-label="主导航">
+                <a href="/" class="nav-link {{ 'active' if request.path == '/' else '' }}"
+                   {{ 'aria-current="page"' if request.path == '/' else '' }}>数据监控</a>
+                <a href="/wiki" class="nav-link {{ 'active' if request.path == '/wiki' else '' }}"
+                   {{ 'aria-current="page"' if request.path == '/wiki' else '' }}>动画百科</a>
+            </nav>
+            {% block header_extra %}{% endblock %}
+        </div>
+    </header>
+
+    <main id="main">
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="site-footer">
+        <p>凡人修仙传 · B站数据监控 | 数据来源：哔哩哔哩</p>
+        <p class="footer-quote">{% block footer_quote %}「仙路崎岖，凡人亦可修仙。」{% endblock %}</p>
+    </footer>
+
+    <script src="{{ url_for('static', filename='js/common.js') }}"></script>
+    {% block scripts %}{% endblock %}
+</body>
+</html>

@@ -1,338 +1,239 @@
-<!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>凡人修仙传 · B站实时数据监控</title>
-    <link rel="stylesheet" href="/static/css/style.css">
-    <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700;900&family=ZCOOL+XiaoWei&display=swap" rel="stylesheet">
-</head>
-<body>
-    <div class="bg-overlay"></div>
-    <div class="floating-particles" id="particles"></div>
-    <div class="mist-layer">
-        <div class="mist mist-1"></div>
-        <div class="mist mist-2"></div>
-        <div class="mist mist-3"></div>
-    </div>
+{% extends "base.html" %}
 
-    <header class="header">
-        <div class="header-inner">
-            <div class="logo-area">
-                <div class="logo-icon">
-                    <svg viewBox="0 0 60 60" class="taiji-icon">
-                        <circle cx="30" cy="30" r="28" fill="none" stroke="currentColor" stroke-width="2"/>
-                        <path d="M30 2 A28 28 0 0 1 30 58 A14 14 0 0 0 30 30 A14 14 0 0 1 30 2" fill="currentColor"/>
-                        <circle cx="30" cy="16" r="4" fill="var(--bg-dark)"/>
-                        <circle cx="30" cy="44" r="4" fill="currentColor"/>
-                    </svg>
-                </div>
-                <div class="logo-text">
-                    <h1>凡人修仙传</h1>
-                    <span class="subtitle">B站实时数据监控</span>
-                </div>
-            </div>
-            <div class="header-controls">
-                <nav class="nav-links">
-                    <a href="/" class="nav-link active">数据监控</a>
-                    <a href="/wiki" class="nav-link">动画百科</a>
-                </nav>
-                <label class="auto-refresh-toggle">
-                    <input type="checkbox" id="autoRefresh" checked>
-                    <span class="toggle-slider"></span>
-                    <span class="toggle-label">自动刷新</span>
-                </label>
-                <button class="btn-refresh" id="btnRefresh" title="手动刷新">
-                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M1 4v6h6M23 20v-6h-6"/>
-                        <path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 0 1 3.51 15"/>
-                    </svg>
-                </button>
-            </div>
-        </div>
-    </header>
-
-    <section class="hero-banner">
-        <div class="hero-bg">
-            <img src="/img_proxy?url=https://i0.hdslb.com/bfs/bangumi/image/0af10a0c3258186e96fde4406b384c13dd643d8f.png" alt="凡人修仙传" class="hero-cover">
-            <div class="hero-overlay"></div>
-        </div>
-        <div class="hero-content">
+{% block content %}
+<!-- ============ 英雄区 ============ -->
+<section class="hero">
+    <div class="container" style="position:relative;">
+        <span class="hero-watermark" aria-hidden="true">凡</span>
+        <div class="hero-grid">
             <div class="hero-info">
-                <div class="hero-badge">B站独家 · 国创动画</div>
+                <span class="hero-badge">B站独家 · 国创动画</span>
                 <h2 class="hero-title">凡人修仙传</h2>
                 <p class="hero-desc">凡人修仙，仙路崎岖。一个普通的山村穷小子，偶然之下跨入到一个江湖小门派，虽然天资平庸，但依靠自身努力和合理处世，步步为营，最终修炼成仙。</p>
                 <div class="hero-stats">
                     <div class="hero-stat">
-                        <span class="hero-stat-value" id="heroScore">9.7</span>
+                        <span class="hero-stat-value num" id="heroScore">--</span>
                         <span class="hero-stat-label">评分</span>
                     </div>
-                    <div class="hero-stat-divider"></div>
+                    <div class="stat-divider" aria-hidden="true"></div>
                     <div class="hero-stat">
-                        <span class="hero-stat-value" id="heroViews">--</span>
+                        <span class="hero-stat-value num" id="heroViews">--</span>
                         <span class="hero-stat-label">总播放</span>
                     </div>
-                    <div class="hero-stat-divider"></div>
-                    <div class="hero-stat">
-                        <span class="hero-stat-value" id="heroFollow">1671万</span>
+                    <div class="stat-divider" aria-hidden="true"></div>
+                    <div class="hero-stat" id="heroFollowCard" hidden>
+                        <span class="hero-stat-value num" id="heroFollow">--</span>
                         <span class="hero-stat-label">追番</span>
                     </div>
-                    <div class="hero-stat-divider"></div>
+                    <div class="stat-divider" aria-hidden="true"></div>
                     <div class="hero-stat">
-                        <span class="hero-stat-value" id="heroEps">272</span>
+                        <span class="hero-stat-value num" id="heroEps">--</span>
                         <span class="hero-stat-label">集数</span>
                     </div>
                 </div>
             </div>
-            <div class="hero-gallery">
-                <button class="gallery-arrow" id="galleryPrev" title="上一页">◀</button>
+            <div class="hero-gallery" aria-label="最新剧集剧照">
                 <div class="gallery-track" id="galleryTrack"></div>
-                <button class="gallery-arrow" id="galleryNext" title="下一页">▶</button>
             </div>
-        </div>
-        <div class="sword-qi sword-qi-1"></div>
-        <div class="sword-qi sword-qi-2"></div>
-    </section>
-
-    <section class="quotes-section">
-        <div class="quotes-container">
-            <div class="quote active" data-index="0">
-                <span class="quote-mark">"</span>
-                <span class="quote-text">仙路崎岖，凡人亦可修仙。</span>
-                <span class="quote-author">—— 韩立</span>
-            </div>
-            <div class="quote" data-index="1">
-                <span class="quote-mark">"</span>
-                <span class="quote-text">我韩立一生，不弱于人。</span>
-                <span class="quote-author">—— 韩立</span>
-            </div>
-            <div class="quote" data-index="2">
-                <span class="quote-mark">"</span>
-                <span class="quote-text">修仙之路，本就是逆天而行。</span>
-                <span class="quote-author">—— 墨大夫</span>
-            </div>
-            <div class="quote" data-index="3">
-                <span class="quote-mark">"</span>
-                <span class="quote-text">大道三千，各有各的缘法。</span>
-                <span class="quote-author">—— 南宫婉</span>
-            </div>
-        </div>
-        <div class="quote-dots">
-            <span class="quote-dot active" data-index="0"></span>
-            <span class="quote-dot" data-index="1"></span>
-            <span class="quote-dot" data-index="2"></span>
-            <span class="quote-dot" data-index="3"></span>
-        </div>
-    </section>
-
-    <main class="main-content">
-        <section class="overview-section">
-            <div class="section-title">
-                <span class="title-decoration">◆</span>
-                <h2>数据总览</h2>
-                <span class="title-decoration">◆</span>
-            </div>
-            <div class="overview-cards" id="overviewCards">
-                <div class="overview-card" data-type="view">
-                    <div class="card-icon">👁</div>
-                    <div class="card-value" id="totalViews">--</div>
-                    <div class="card-label">总播放量</div>
-                </div>
-                <div class="overview-card" data-type="danmaku">
-                    <div class="card-icon">💬</div>
-                    <div class="card-value" id="totalDanmaku">--</div>
-                    <div class="card-label">总弹幕数</div>
-                </div>
-                <div class="overview-card" data-type="coin">
-                    <div class="card-icon">🪙</div>
-                    <div class="card-value" id="totalCoin">--</div>
-                    <div class="card-label">总投币</div>
-                </div>
-                <div class="overview-card" data-type="like">
-                    <div class="card-icon">❤️</div>
-                    <div class="card-value" id="totalLike">--</div>
-                    <div class="card-label">总点赞</div>
-                </div>
-                <div class="overview-card" data-type="favorite">
-                    <div class="card-icon">⭐</div>
-                    <div class="card-value" id="totalFavorite">--</div>
-                    <div class="card-label">总收藏</div>
-                </div>
-                <div class="overview-card" data-type="score">
-                    <div class="card-icon">🏆</div>
-                    <div class="card-value" id="totalScore">--</div>
-                    <div class="card-label">评分</div>
-                </div>
-            </div>
-        </section>
-
-        <section class="progress-section">
-            <div class="xiuxian-progress">
-                <div class="progress-title">
-                    <span>韩立修仙进度</span>
-                    <span class="progress-realm" id="currentRealm">炼气期</span>
-                </div>
-                <div class="progress-bar-outer">
-                    <div class="progress-bar-inner" id="progressBar" style="width: 0%">
-                        <div class="progress-glow"></div>
-                    </div>
-                    <div class="progress-markers">
-                        <span class="marker" style="left:0%">炼气</span>
-                        <span class="marker" style="left:9.2%">筑基</span>
-                        <span class="marker" style="left:23.9%">结丹</span>
-                        <span class="marker" style="left:44.1%">元婴</span>
-                        <span class="marker" style="left:66.2%">化神</span>
-                        <span class="marker" style="left:80.9%">合体</span>
-                        <span class="marker" style="left:93.8%">大乘</span>
-                        <span class="marker" style="left:100%">飞升</span>
-                    </div>
-                </div>
-                <div class="progress-info">
-                    <span>已更新 <strong id="epUpdated">0</strong> 集 / 共 <strong id="epTotal">272</strong> 集</span>
-                    <span class="progress-pct" id="progressPct">0%</span>
-                </div>
-                <div class="breakthrough-effect" id="breakthroughEffect">
-                    <div class="breakthrough-text">境界突破！</div>
-                </div>
-            </div>
-        </section>
-
-        <section class="selector-section">
-            <div class="section-title">
-                <span class="title-decoration">◆</span>
-                <h2>集数详情</h2>
-                <span class="title-decoration">◆</span>
-            </div>
-            <div class="selector-panel">
-                <div class="selector-left">
-                    <div class="season-tabs" id="seasonTabs"></div>
-                    <div class="episode-grid" id="episodeGrid">
-                        <div class="loading-placeholder">
-                            <div class="loading-spinner"></div>
-                            <span>正在加载集数...</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="selector-right">
-                    <div class="search-box">
-                        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
-                            <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
-                        </svg>
-                        <input type="text" id="searchInput" placeholder="搜索集数或标题...">
-                    </div>
-                    <div class="realtime-display" id="realtimeDisplay">
-                        <div class="realtime-tag">
-                            <span class="pulse-dot"></span>
-                            <span>实时数据</span>
-                        </div>
-                        <div class="ep-cover-preview" id="epCoverPreview">
-                            <img src="" alt="" id="epCoverImg" class="ep-cover-img">
-                            <div class="ep-cover-overlay"></div>
-                        </div>
-                        <div class="realtime-ring">
-                            <svg viewBox="0 0 200 200" class="ring-svg">
-                                <circle cx="100" cy="100" r="90" fill="none" stroke="rgba(201,169,110,0.15)" stroke-width="8"/>
-                                <circle cx="100" cy="100" r="90" fill="none" stroke="url(#goldGradient)" stroke-width="8"
-                                    stroke-dasharray="565" stroke-dashoffset="565" stroke-linecap="round"
-                                    class="ring-progress" id="ringProgress"/>
-                                <defs>
-                                    <linearGradient id="goldGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                                        <stop offset="0%" stop-color="#c9a96e"/>
-                                        <stop offset="100%" stop-color="#f0d78c"/>
-                                    </linearGradient>
-                                </defs>
-                            </svg>
-                            <div class="realtime-count">
-                                <span class="count-number" id="realtimeCount">0</span>
-                                <span class="count-label">实时观看人数</span>
-                            </div>
-                        </div>
-                        <div class="ep-mini-stats" id="epMiniStats">
-                            <div class="mini-stat"><span class="mini-stat-icon">👁</span><span class="mini-stat-val" id="miniViews">--</span></div>
-                            <div class="mini-stat"><span class="mini-stat-icon">💬</span><span class="mini-stat-val" id="miniDanmaku">--</span></div>
-                            <div class="mini-stat"><span class="mini-stat-icon">🪙</span><span class="mini-stat-val" id="miniCoin">--</span></div>
-                            <div class="mini-stat"><span class="mini-stat-icon">❤️</span><span class="mini-stat-val" id="miniLike">--</span></div>
-                        </div>
-                        <div class="current-ep-info" id="currentEpInfo">
-                            <span class="ep-name">请选择一集</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <section class="charts-section">
-            <div class="section-title">
-                <span class="title-decoration">◆</span>
-                <h2>数据分析</h2>
-                <span class="title-decoration">◆</span>
-            </div>
-            <div class="charts-grid">
-                <div class="chart-card chart-wide">
-                    <div class="chart-header">
-                        <h3>各集累计播放量</h3>
-                        <div class="chart-legend">
-                            <span class="legend-dot" style="background:var(--accent-gold)"></span> 播放量
-                        </div>
-                    </div>
-                    <div class="chart-body" id="chartViews"></div>
-                </div>
-                <div class="chart-card">
-                    <div class="chart-header">
-                        <h3>当前选中集 · 多维数据</h3>
-                    </div>
-                    <div class="chart-body" id="chartRadar"></div>
-                </div>
-                <div class="chart-card">
-                    <div class="chart-header">
-                        <h3>实时观看趋势</h3>
-                    </div>
-                    <div class="chart-body" id="chartTrend"></div>
-                </div>
-                <div class="chart-card chart-wide">
-                    <div class="chart-header">
-                        <h3>全集互动数据</h3>
-                        <div class="chart-legend">
-                            <span class="legend-dot" style="background:#f0d78c"></span> 播放
-                            <span class="legend-dot" style="background:#e63946"></span> 弹幕
-                            <span class="legend-dot" style="background:#3a86ff"></span> 投币
-                            <span class="legend-dot" style="background:#2ec4b6"></span> 点赞
-                            <span class="legend-dot" style="background:#8b5cf6"></span> 收藏
-                        </div>
-                    </div>
-                    <div class="chart-body chart-body-tall" id="chartInteraction"></div>
-                </div>
-            </div>
-        </section>
-    </main>
-
-    <footer class="footer">
-        <div class="footer-inner">
-            <div class="footer-gallery">
-                <img src="/img_proxy?url=http://i0.hdslb.com/bfs/archive/5ac571880f996eead5af559de2509228e20164cf.jpg" alt="" class="footer-img" loading="lazy">
-                <img src="/img_proxy?url=http://i0.hdslb.com/bfs/archive/90ccd86f772635d556ea4b1395480cac6e3d13c4.jpg" alt="" class="footer-img" loading="lazy">
-                <img src="/img_proxy?url=http://i0.hdslb.com/bfs/archive/b6d973be1b418c351dab1027f9215f35ad9fa6f0.jpg" alt="" class="footer-img" loading="lazy">
-            </div>
-            <p>凡人修仙传 · B站实时数据监控 | 数据来源：哔哩哔哩</p>
-            <p class="footer-quote">「仙路崎岖，凡人亦可修仙。—— 韩立」</p>
-        </div>
-    </footer>
-
-    <div class="loading-overlay" id="loadingOverlay">
-        <div class="loading-content">
-            <div class="loading-taiji">
-                <svg viewBox="0 0 60 60" class="taiji-icon">
-                    <circle cx="30" cy="30" r="28" fill="none" stroke="currentColor" stroke-width="2"/>
-                    <path d="M30 2 A28 28 0 0 1 30 58 A14 14 0 0 0 30 30 A14 14 0 0 1 30 2" fill="currentColor"/>
-                    <circle cx="30" cy="16" r="4" fill="var(--bg-dark)"/>
-                    <circle cx="30" cy="44" r="4" fill="currentColor"/>
-                </svg>
-            </div>
-            <div class="loading-text">灵气汇聚中...</div>
         </div>
     </div>
+</section>
 
-    <script src="/static/js/main.js"></script>
-</body>
-</html>
+<div class="container">
+    <!-- ============ 名句 ============ -->
+    <section class="quotes-section section" aria-label="剧中名句">
+        <div class="quotes-stage" id="quotesStage">
+            <blockquote class="quote active">
+                <span class="quote-text">仙路崎岖，凡人亦可修仙。</span>
+                <span class="quote-author">—— 韩立</span>
+            </blockquote>
+            <blockquote class="quote">
+                <span class="quote-text">我韩立一生，不弱于人。</span>
+                <span class="quote-author">—— 韩立</span>
+            </blockquote>
+            <blockquote class="quote">
+                <span class="quote-text">修仙之路，本就是逆天而行。</span>
+                <span class="quote-author">—— 墨大夫</span>
+            </blockquote>
+            <blockquote class="quote">
+                <span class="quote-text">大道三千，各有各的缘法。</span>
+                <span class="quote-author">—— 南宫婉</span>
+            </blockquote>
+        </div>
+        <div class="quote-dots" id="quoteDots" role="tablist" aria-label="切换名句">
+            <button class="quote-dot active" data-index="0" aria-label="名句一"></button>
+            <button class="quote-dot" data-index="1" aria-label="名句二"></button>
+            <button class="quote-dot" data-index="2" aria-label="名句三"></button>
+            <button class="quote-dot" data-index="3" aria-label="名句四"></button>
+        </div>
+    </section>
+
+    <!-- ============ 数据总览 ============ -->
+    <section class="section" aria-label="数据总览">
+        <div class="section-title">
+            <h2><span class="title-dot"></span>数据总览<span class="title-dot"></span></h2>
+        </div>
+        <div class="overview-cards" id="overviewCards">
+            <div class="overview-card">
+                <div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg></div>
+                <div class="card-value num" id="totalViews">--</div>
+                <div class="card-label">总播放</div>
+            </div>
+            <div class="overview-card">
+                <div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M21 11.5a8.38 8.38 0 0 1-9 8.3 8.5 8.5 0 0 1-3.5-.7L3 21l1.9-5.5a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 8.5-8.5 8.38 8.38 0 0 1 8.5 8.3z"/></svg></div>
+                <div class="card-value num" id="totalDanmaku">--</div>
+                <div class="card-label">总弹幕</div>
+            </div>
+            <div class="overview-card">
+                <div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="9"/><path d="M12 7v10M15.5 9.2c-.6-1-1.9-1.7-3.5-1.7-2 0-3.5 1-3.5 2.4 0 3.2 7 1.5 7 4.6 0 1.4-1.5 2.4-3.5 2.4-1.6 0-2.9-.7-3.5-1.7"/></svg></div>
+                <div class="card-value num" id="totalCoin">--</div>
+                <div class="card-label">总投币</div>
+            </div>
+            <div class="overview-card">
+                <div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></div>
+                <div class="card-value num" id="totalLike">--</div>
+                <div class="card-label">总点赞</div>
+            </div>
+            <div class="overview-card">
+                <div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg></div>
+                <div class="card-value num" id="totalFavorite">--</div>
+                <div class="card-label">总收藏</div>
+            </div>
+            <div class="overview-card">
+                <div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="8" r="6"/><path d="M15.5 13l2 8L12 17.5 6.5 21l2-8"/></svg></div>
+                <div class="card-value num" id="totalScore">--</div>
+                <div class="card-label">评分</div>
+            </div>
+        </div>
+        <div class="overview-meta">
+            <span class="fresh-stamp" id="overviewStamp" hidden>更新于 --</span>
+        </div>
+    </section>
+
+    <!-- ============ 修仙进度 ============ -->
+    <section class="section" aria-label="更新进度">
+        <div class="xiuxian-progress card">
+            <div class="progress-title">
+                <span title="境界划分基于集数的示意估算">韩立修仙进度 <small style="color:var(--ink-3);font-size:.72rem;letter-spacing:.1em;">（示意）</small></span>
+                <span class="realm-chip" id="currentRealm">炼气期</span>
+            </div>
+            <div class="progress-bar-outer" role="progressbar" aria-label="更新进度" aria-valuemin="0" aria-valuemax="100" id="progressOuter">
+                <div class="progress-bar-inner" id="progressBar"></div>
+            </div>
+            <div class="progress-markers" id="progressMarkers" aria-hidden="true">
+                <span class="marker" style="left:0%">炼气</span>
+                <span class="marker" style="left:9.2%">筑基</span>
+                <span class="marker" style="left:23.9%">结丹</span>
+                <span class="marker" style="left:44.1%">元婴</span>
+                <span class="marker" style="left:66.2%">化神</span>
+                <span class="marker" style="left:80.9%">合体</span>
+                <span class="marker" style="left:93.8%">大乘</span>
+                <span class="marker" style="left:100%">飞升</span>
+            </div>
+            <div class="progress-info">
+                <span>已更新 <strong id="epUpdated">-</strong> 集 / 共 <strong id="epTotal">-</strong> 集</span>
+                <span class="progress-pct" id="progressPct">-</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============ 集数详情 ============ -->
+    <section class="section" aria-label="集数详情">
+        <div class="section-title">
+            <h2><span class="title-dot"></span>集数详情<span class="title-dot"></span></h2>
+        </div>
+        <div class="selector-panel">
+            <div class="panel-block selector-left">
+                <div class="search-box">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+                    <input type="search" id="searchInput" placeholder="搜索集数或标题…" aria-label="搜索集数">
+                </div>
+                <div class="season-tabs" id="seasonTabs" role="tablist" aria-label="季度筛选"></div>
+                <div class="episode-grid" id="episodeGrid" role="listbox" aria-label="选择剧集">
+                    <div class="state-block" id="gridSkeleton" aria-live="polite">
+                        <div class="state-icon">墨</div>
+                        <p>正在加载集数…</p>
+                    </div>
+                </div>
+            </div>
+            <aside class="realtime-display card" aria-label="当前选中剧集实时数据">
+                <span class="realtime-tag"><span class="pulse-dot" aria-hidden="true"></span>实时数据</span>
+                <div class="ep-cover-preview">
+                    <img src="" alt="" id="epCoverImg" class="ep-cover-img" loading="lazy" hidden>
+                    <div class="skeleton" id="epCoverSkeleton" style="position:absolute;inset:0;"></div>
+                </div>
+                <div class="realtime-ring">
+                    <svg viewBox="0 0 200 200" class="ring-svg" aria-hidden="true">
+                        <circle cx="100" cy="100" r="90" fill="none" stroke-width="7" class="ring-bg"/>
+                        <circle cx="100" cy="100" r="90" fill="none" stroke-width="7"
+                            stroke-dasharray="565.49" stroke-dashoffset="565.49"
+                            stroke-linecap="round" class="ring-progress" id="ringProgress"/>
+                    </svg>
+                    <div class="realtime-count">
+                        <span class="count-number num" id="realtimeCount">--</span>
+                        <span class="count-label">实时观看人数</span>
+                    </div>
+                </div>
+                <div class="ep-mini-stats" id="epMiniStats">
+                    <div class="mini-stat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg><span class="mini-stat-val" id="miniViews">--</span></div>
+                    <div class="mini-stat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 11.5a8.38 8.38 0 0 1-9 8.3 8.5 8.5 0 0 1-3.5-.7L3 21l1.9-5.5a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 8.5-8.5 8.38 8.38 0 0 1 8.5 8.3z"/></svg><span class="mini-stat-val" id="miniDanmaku">--</span></div>
+                    <div class="mini-stat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 7v10M15.5 9.2c-.6-1-1.9-1.7-3.5-1.7-2 0-3.5 1-3.5 2.4 0 3.2 7 1.5 7 4.6 0 1.4-1.5 2.4-3.5 2.4-1.6 0-2.9-.7-3.5-1.7"/></svg><span class="mini-stat-val" id="miniCoin">--</span></div>
+                    <div class="mini-stat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg><span class="mini-stat-val" id="miniLike">--</span></div>
+                </div>
+                <div class="current-ep-info" id="currentEpInfo">
+                    <span class="ep-name">请选择一集</span>
+                </div>
+            </aside>
+        </div>
+    </section>
+
+    <!-- ============ 数据分析 ============ -->
+    <section class="section" aria-label="数据分析图表">
+        <div class="section-title">
+            <h2><span class="title-dot"></span>数据分析<span class="title-dot"></span></h2>
+        </div>
+        <div class="charts-grid">
+            <div class="chart-card chart-wide">
+                <div class="chart-header">
+                    <h3>各集累计播放量</h3>
+                    <span class="fresh-stamp">拖动滑块浏览全部剧集</span>
+                </div>
+                <div class="chart-body" id="chartViews"></div>
+            </div>
+            <div class="chart-card">
+                <div class="chart-header"><h3>选中集 · 多维数据</h3></div>
+                <div class="chart-body" id="chartRadar"></div>
+            </div>
+            <div class="chart-card">
+                <div class="chart-header"><h3>实时观看趋势</h3></div>
+                <div class="chart-body" id="chartTrend"></div>
+            </div>
+            <div class="chart-card chart-wide">
+                <div class="chart-header"><h3>全集互动数据</h3></div>
+                <div class="chart-body chart-body-tall" id="chartInteraction"></div>
+            </div>
+        </div>
+    </section>
+</div>
+{% endblock %}
+
+{% block header_extra %}
+<div class="header-controls">
+    <label class="switch" title="每30秒自动刷新实时人数">
+        <input type="checkbox" id="autoRefresh" checked>
+        <span class="switch-track" aria-hidden="true"></span>
+        <span class="switch-label">自动刷新</span>
+    </label>
+    <button class="btn-icon" id="btnRefresh" title="手动刷新全部数据" aria-label="手动刷新">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M1 4v6h6M23 20v-6h-6"/>
+            <path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 0 1 3.51 15"/>
+        </svg>
+    </button>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='vendor/echarts.min.js') }}"></script>
+<script src="{{ url_for('static', filename='js/index.js') }}"></script>
+{% endblock %}
