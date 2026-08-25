@@ -4,3 +4,5 @@ data/
 .git/
 docs/
 *.md
+
+fm_*.log
