@@ -286,6 +286,7 @@
     gap: 22px;
     align-items: start;
 }
+.selector-panel > * { min-width: 0; }
 .panel-block {
     background: var(--paper-card);
     border: 1px solid var(--ink-line);
@@ -459,6 +460,7 @@
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 20px;
 }
+.charts-grid > .chart-card { min-width: 0; }
 .chart-wide { grid-column: 1 / -1; }
 .chart-card {
     background: var(--paper-card);
@@ -479,7 +481,7 @@
     color: var(--ink);
     font-weight: 600;
 }
-.chart-body { height: 300px; }
+.chart-body { height: 300px; width: 100%; overflow: hidden; }
 .chart-body-tall { height: 350px; }
 .chart-pagination { display: none; } /* 已由 dataZoom 取代 */
 
