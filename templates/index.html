@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+﻿{% extends "base.html" %}
 
 {% block content %}
 <!-- ============ 英雄区 ============ -->
@@ -234,6 +234,6 @@
 {% endblock %}
 
 {% block scripts %}
-<script src="{{ url_for('static', filename='vendor/echarts.min.js') }}"></script>
-<script src="{{ url_for('static', filename='js/index.js') }}"></script>
+<script src="{{ static_v('vendor/echarts.min.js') }}"></script>
+<script src="{{ static_v('js/index.js') }}"></script>
 {% endblock %}

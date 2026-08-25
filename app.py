@@ -12,7 +12,7 @@ from bilibili_api import FANREN_SEASONS, api
 from cache_store import CacheStore
 from config import (BATCH_AID_LIMIT, BATCH_WORKERS, DEBUG, EPISODES_TTL,
                     HOST, OVERVIEW_TTL, PORT, REALTIME_TTL,
-                    SAMPLER_INTERVAL)
+                    SAMPLER_INTERVAL, STATIC_MAX_AGE)
 
 store = CacheStore()
 
@@ -49,9 +49,29 @@ def ensure_episodes():
     return eps
 
 
+def _parse_online_total(raw):
+    """上游返回 int 或 '1000+' 形式截断字符串，解析为 (数值, 显示文本)"""
+    s = str(raw)
+    digits = "".join(ch for ch in s if ch.isdigit())
+    n = int(digits) if digits else 0
+    return n, (s if s.endswith("+") else str(n))
+
+
 def create_app():
     app = Flask(__name__)
-    app.config["SEND_FILE_MAX_AGE_DEFAULT"] = 86400
+    app.config["SEND_FILE_MAX_AGE_DEFAULT"] = STATIC_MAX_AGE
+
+    @app.template_global()
+    def static_v(filename):
+        """静态文件 URL 带 mtime 版本号，文件变更自动破缓存"""
+        import os
+        from flask import url_for
+        path = os.path.join(app.static_folder, filename)
+        try:
+            v = int(os.path.getmtime(path))
+        except OSError:
+            v = 0
+        return url_for("static", filename=filename, v=v)
 
     @app.route("/")
     def index():
@@ -81,18 +101,20 @@ def create_app():
         key = f"rt:{aid}"
         cached, hit = store.get(key)
         if hit:
+            c = cached if isinstance(cached, dict) else {"count": cached, "display": str(cached)}
             return jsonify({"code": 0, "data": {"aid": aid, "cid": cid,
-                                                "count": cached}})
+                                                "count": c["count"], "display": c["display"]}})
         result = api.get_realtime_online(aid, cid)
         if result.get("code") != 0:
             return jsonify({"code": -1,
                             "message": result.get("message", "获取失败")})
-        count = int(result.get("data", {}).get("total", 0))
-        store.set(key, count, REALTIME_TTL)
+        raw = result.get("data", {}).get("total", 0)
+        count, display = _parse_online_total(raw)
+        store.set(key, {"count": count, "display": display}, REALTIME_TTL)
         store.append_trend(aid, count)
         _schedule_save()
         return jsonify({"code": 0, "data": {"aid": aid, "cid": cid,
-                                            "count": count}})
+                                            "count": count, "display": display}})
 
     @app.route("/api/overview")
     def get_overview():
@@ -184,7 +206,8 @@ def main():
         res = api.get_realtime_online(latest["aid"], latest["cid"])
         if res.get("code") != 0:
             return
-        count = int(res.get("data", {}).get("total", 0))
+        raw = res.get("data", {}).get("total", 0)
+        count, _ = _parse_online_total(raw)
         store.append_trend(latest["aid"], count)
 
     sampler.start(_sample_latest, SAMPLER_INTERVAL, name="实时采样")

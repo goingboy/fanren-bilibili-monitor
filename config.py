@@ -21,3 +21,5 @@ BATCH_AID_LIMIT = 400    # 单次批量请求 aid 数上限
 
 IMG_CACHE_MAX_BYTES = 200 * 1024 * 1024   # 图片磁盘缓存上限
 IMG_CLEANUP_EVERY = 50                    # 每N次未命中清理一次
+
+STATIC_MAX_AGE = 0 if DEBUG else 86400    # 开发时不缓存静态文件

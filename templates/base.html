@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
@@ -9,10 +9,10 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700;900&family=ZCOOL+XiaoWei&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/tokens.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/pages.css') }}">
+    <link rel="stylesheet" href="{{ static_v('css/tokens.css') }}">
+    <link rel="stylesheet" href="{{ static_v('css/base.css') }}">
+    <link rel="stylesheet" href="{{ static_v('css/components.css') }}">
+    <link rel="stylesheet" href="{{ static_v('css/pages.css') }}">
     {% block head %}{% endblock %}
 </head>
 <body>
@@ -52,7 +52,7 @@
         <p class="footer-quote">{% block footer_quote %}「仙路崎岖，凡人亦可修仙。」{% endblock %}</p>
     </footer>
 
-    <script src="{{ url_for('static', filename='js/common.js') }}"></script>
+    <script src="{{ static_v('js/common.js') }}"></script>
     {% block scripts %}{% endblock %}
 </body>
 </html>
