@@ -1,0 +1,37 @@
+/* ============================================
+   凡人修仙传 · 水墨设计系统 —— 设计令牌
+   宣纸白 · 淡雅水墨
+   ============================================ */
+:root {
+    /* 纸 */
+    --paper: #f5f1e8;
+    --paper-deep: #efe9db;
+    --paper-card: #fbf8f1;
+
+    /* 墨 */
+    --ink: #1a1a18;
+    --ink-2: #4a4a45;
+    --ink-3: #8a8578;
+    --ink-line: rgba(26, 26, 24, 0.14);
+    --ink-line-strong: rgba(26, 26, 24, 0.30);
+    --ink-wash: rgba(26, 26, 24, 0.05);
+
+    /* 点缀 */
+    --cinnabar: #b03a2e;
+    --cinnabar-deep: #8e2f25;
+    --indigo: #3d4a5c;
+    --indigo-light: #6b7a8f;
+
+    /* 阴影与圆角 */
+    --shadow-card: 0 1px 2px rgba(26, 26, 24, 0.05), 0 6px 18px rgba(26, 26, 24, 0.08);
+    --radius: 3px;
+
+    /* 字体 */
+    --font-serif: 'Noto Serif SC', 'Songti SC', 'STSong', 'SimSun', serif;
+    --font-display: 'ZCOOL XiaoWei', 'Noto Serif SC', 'KaiTi', 'STKaiti', 'SimSun', serif;
+
+    --transition: 0.25s ease;
+
+    /* 布局 */
+    --page-max: 1240px;
+}
