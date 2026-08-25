@@ -85,4 +85,61 @@
             timer = setTimeout(applyFilter, 180);
         });
     }
+
+    // ---- 剧照鉴赏（数据来自剧集封面） ----
+    async function initGallery() {
+        const wrap = document.getElementById('wikiGallery');
+        if (!wrap) return;
+        try {
+            const d = await window.FM.fetchJSON('/api/episodes');
+            if (d.code !== 0 || !d.data.length) throw new Error('no data');
+            const eps = d.data;
+            const step = Math.max(1, Math.floor(eps.length / 12));
+            const picks = [];
+            for (let i = eps.length - 1; i >= 0 && picks.length < 12; i -= step) {
+                picks.push(eps[i]);
+            }
+            picks.reverse();
+            wrap.innerHTML = '';
+            picks.forEach(ep => {
+                const a = document.createElement('a');
+                a.className = 'wiki-still';
+                a.href = 'https://www.bilibili.com/bangumi/play/ep' + ep.id;
+                a.target = '_blank';
+                a.rel = 'noopener';
+                a.setAttribute('aria-label', '观看第' + ep.title + '集');
+                const img = document.createElement('img');
+                img.loading = 'lazy';
+                img.alt = '第' + ep.title + '集剧照';
+                img.src = '/img_proxy?url=' + encodeURIComponent(ep.cover || '');
+                const label = document.createElement('span');
+                label.className = 'wiki-still-label';
+                label.textContent = '第' + ep.title + '集' + (ep.long_title ? ' · ' + ep.long_title : '');
+                a.appendChild(img);
+                a.appendChild(label);
+                wrap.appendChild(a);
+            });
+        } catch (e) {
+            wrap.innerHTML = '<div class="state-block"><p>剧照加载失败，刷新重试</p></div>';
+        }
+    }
+
+    // ---- 印章色调轮换（墨/朱/黛） ----
+    const TONES = ['seal-ink', 'seal-cinnabar', 'seal-indigo'];
+    document.querySelectorAll('.wiki-detail-avatar').forEach((a, i) => {
+        a.classList.add(TONES[i % 3]);
+    });
+
+    // ---- 标签计数 ----
+    document.querySelectorAll('.wiki-tab').forEach(t => {
+        const c = document.getElementById('tab-' + t.dataset.tab);
+        if (!c) return;
+        const n = c.querySelectorAll('.wiki-detail-card, .wiki-timeline-item').length;
+        const badge = document.createElement('span');
+        badge.className = 'tab-count';
+        badge.textContent = n;
+        t.appendChild(badge);
+    });
+
+    initGallery();
 })();

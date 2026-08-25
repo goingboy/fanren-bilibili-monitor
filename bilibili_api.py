@@ -99,6 +99,14 @@ class BilibiliAPI:
             "https://api.bilibili.com/x/player/online/total",
             {"aid": aid, "cid": cid})
 
+    @staticmethod
+    def _is_preview(ep: dict) -> bool:
+        """预告/预览集不算正片（badge_type=1 或文字含'预告'）"""
+        if ep.get("badge_type") == 1:
+            return True
+        text = str(ep.get("badge", "")) + str(ep.get("long_title", "")) + str(ep.get("title", ""))
+        return "预告" in text
+
     def get_all_episodes(self) -> list:
         all_episodes = []
         for season in FANREN_SEASONS:
@@ -107,10 +115,12 @@ class BilibiliAPI:
                 continue
             result = data.get("result", {})
             for ep in result.get("episodes", []):
+                if self._is_preview(ep):
+                    continue
                 ep["season_title"] = season["title"]
                 ep["season_alias"] = season["alias"]
                 ep["season_id"] = season["season_id"]
-            all_episodes.extend(result.get("episodes", []))
+                all_episodes.append(ep)
         return all_episodes
 
     def get_overview(self) -> list:
@@ -135,7 +145,8 @@ class BilibiliAPI:
                 "title": season["title"],
                 "alias": season["alias"],
                 "cover": result.get("cover", ""),
-                "total": len(result.get("episodes", [])),
+                "total": len([e for e in result.get("episodes", [])
+                              if not self._is_preview(e)]),
                 "new_ep": result.get("new_ep", {}),
                 "rating": result.get("rating", {}),
                 "stat": normalized_stat,

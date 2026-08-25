@@ -9,12 +9,12 @@
     const $ = (id) => document.getElementById(id);
     const RING_LEN = 565.49; // 2πr, r=90
 
-    // 修仙境界（基于集数，示意）
+    // 修仙境界（基于集数，示意；元婴期起自慕兰之战前后）
     const REALMS = [
         { name: '炼气期', ep: 0 }, { name: '筑基期', ep: 25 },
-        { name: '结丹期', ep: 65 }, { name: '元婴期', ep: 120 },
-        { name: '化神期', ep: 180 }, { name: '合体期', ep: 220 },
-        { name: '大乘期', ep: 255 }, { name: '渡劫飞升', ep: 272 },
+        { name: '结丹期', ep: 65 }, { name: '元婴期', ep: 180 },
+        { name: '化神期', ep: 260 }, { name: '合体期', ep: 280 },
+        { name: '大乘期', ep: 290 }, { name: '渡劫飞升', ep: 293 },
     ];
 
     const state = {
@@ -103,15 +103,16 @@
     }
 
     // ============ 修仙进度 ============
+    const NOMINAL_TOTAL = 293; // 修仙历程示意总长（与真实更新数无关）
+
     function renderProgress() {
         const eps = state.episodes;
         if (!eps.length) return;
         const latest = eps.reduce((a, b) => (b.pub_time || 0) > (a.pub_time || 0) ? b : a);
         const latestNum = parseInt(latest.title, 10) || eps.length;
-        const total = (state.overview && state.overview.total) || eps.length;
+        const total = NOMINAL_TOTAL;
 
         $('epUpdated').textContent = latestNum;
-        $('epTotal').textContent = total;
 
         let idx = 0;
         REALMS.forEach((r, i) => { if (latestNum >= r.ep) idx = i; });
@@ -121,11 +122,33 @@
         const endPct = idx < REALMS.length - 1 ? endEp / total * 100 : 100;
         const pct = startPct + (latestNum - startEp) / Math.max(1, endEp - startEp) * (endPct - startPct);
 
-        $('currentRealm').textContent = REALMS[idx].name;
+        // 境界细分：初/中/后期（最后一档不细分）
+        let realmLabel = REALMS[idx].name;
+        if (idx < REALMS.length - 1 && endEp > startEp) {
+            const within = (latestNum - startEp) / (endEp - startEp);
+            const sub = within < 1 / 3 ? '初期' : (within < 2 / 3 ? '中期' : '后期');
+            realmLabel = REALMS[idx].name + ' · ' + sub;
+        }
+        $('currentRealm').textContent = realmLabel;
         $('progressPct').textContent = pct.toFixed(1) + '%';
         $('progressOuter').setAttribute('aria-valuenow', pct.toFixed(1));
         setTimeout(() => { $('progressBar').style.width = pct + '%'; }, 250);
 
+        // 刻度按当前总集数动态生成
+        const markers = $('progressMarkers');
+        if (markers.childElementCount !== REALMS.length || markers.dataset.total !== String(total)) {
+            markers.innerHTML = '';
+            REALMS.forEach((r, i) => {
+                const m = document.createElement('span');
+                m.className = 'marker';
+                const right = i === REALMS.length - 1;
+                m.style.left = right ? '100%' : (r.ep / total * 100).toFixed(1) + '%';
+                m.textContent = r.name.replace('期', '');
+                if (right) m.style.transform = 'translateX(-100%)';
+                markers.appendChild(m);
+            });
+            markers.dataset.total = String(total);
+        }
         document.querySelectorAll('#progressMarkers .marker').forEach((m, i) => {
             m.classList.toggle('reached', !!REALMS[i] && latestNum >= REALMS[i].ep);
         });
@@ -520,6 +543,19 @@
         }, { notMerge: true });
     }
 
+    function computePeaks() {
+        const keys = ['view', 'danmaku', 'coin', 'like', 'reply', 'favorite'];
+        const peaks = {};
+        keys.forEach(k => { peaks[k] = 0; });
+        state.episodes.forEach(e => {
+            keys.forEach(k => {
+                const v = (e.stat && Number(e.stat[k])) || 0;
+                if (v > peaks[k]) peaks[k] = v;
+            });
+        });
+        return peaks;
+    }
+
     function renderRadar(ep) {
         if (!charts.radar) return;
         const s = (ep && ep.stat) || null;
@@ -527,15 +563,30 @@
             emptyChart(charts.radar, ep ? '该集统计加载中…' : '选择剧集后展示');
             return;
         }
+        const keys = ['view', 'danmaku', 'coin', 'like', 'reply', 'favorite'];
         const names = ['播放', '弹幕', '投币', '点赞', '评论', '收藏'];
-        const vals = [s.view, s.danmaku, s.coin, s.like, s.reply, s.favorite]
-            .map(v => Number(v) || 0);
+        const peaks = computePeaks();
+        const vals = keys.map(k => Number(s[k]) || 0);
+        const peakVals = keys.map(k => peaks[k]);
         charts.radar.setOption({
             ...chartBase(),
-            tooltip: { ...chartBase().tooltip },
+            legend: {
+                bottom: 0, textStyle: { color: PALETTE.ink2, fontSize: 11 },
+                itemWidth: 18, itemHeight: 2, icon: 'rect',
+                data: ['当前集', '全剧之最'],
+            },
+            tooltip: {
+                ...chartBase().tooltip,
+                formatter: ps => '<strong>第' + ep.title + '集</strong><br>' +
+                    names.map((n, i) =>
+                        fmt(vals[i]) + ' / 峰值 ' + fmt(peakVals[i]) + '（' + n + '）'
+                    ).join('<br>'),
+            },
             radar: {
-                indicator: names.map((n, i) => ({ name: n, max: Math.max(vals[i] * 1.3, 10) })),
-                radius: '62%',
+                indicator: names.map((n, i) => ({
+                    name: n, max: Math.max(peakVals[i] * 1.12, 10),
+                })),
+                radius: '56%',
                 splitNumber: 3,
                 axisName: { color: PALETTE.ink2, fontSize: 11 },
                 splitLine: { lineStyle: { color: 'rgba(26,26,24,.14)' } },
@@ -544,14 +595,22 @@
             },
             series: [{
                 type: 'radar',
-                data: [{
-                    value: vals,
-                    name: '第' + ep.title + '集',
-                    areaStyle: { color: 'rgba(176,58,46,.14)' },
-                    lineStyle: { color: PALETTE.cinnabar, width: 1.8 },
-                    itemStyle: { color: PALETTE.cinnabar },
-                    symbolSize: 3,
-                }],
+                data: [
+                    {
+                        value: peakVals, name: '全剧之最',
+                        lineStyle: { color: PALETTE.ink3, width: 1.2, type: 'dashed' },
+                        itemStyle: { color: PALETTE.ink3 },
+                        symbol: 'none',
+                        areaStyle: { color: 'rgba(138,133,120,.07)' },
+                    },
+                    {
+                        value: vals, name: '当前集',
+                        areaStyle: { color: 'rgba(176,58,46,.16)' },
+                        lineStyle: { color: PALETTE.cinnabar, width: 2 },
+                        itemStyle: { color: PALETTE.cinnabar },
+                        symbolSize: 3,
+                    },
+                ],
             }],
         }, { notMerge: true });
     }
