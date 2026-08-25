@@ -395,6 +395,225 @@
         if (state.refreshTimer) { clearInterval(state.refreshTimer); state.refreshTimer = null; }
     }
 
+    // ============ 图表（墨色主题，懒初始化） ============
+    const charts = {};
+    let chartsInited = false;
+
+    function chartBase() {
+        return {
+            backgroundColor: 'transparent',
+            textStyle: { color: PALETTE.ink2, fontFamily: 'Noto Serif SC, SimSun, serif' },
+            tooltip: {
+                backgroundColor: 'rgba(251,248,241,0.97)',
+                borderColor: 'rgba(26,26,24,0.25)',
+                borderWidth: 1,
+                padding: [8, 12],
+                textStyle: { color: PALETTE.ink, fontSize: 12 },
+                extraCssText: 'box-shadow:0 4px 16px rgba(26,26,24,.16);border-radius:3px;'
+            },
+        };
+    }
+
+    const AXIS_LINE = { lineStyle: { color: 'rgba(26,26,24,.28)' } };
+    const SPLIT_LINE = { lineStyle: { color: 'rgba(26,26,24,.07)' } };
+
+    function zoomConfig(defaultStart) {
+        return [
+            { type: 'inside', start: defaultStart, end: 100, zoomOnMouseWheel: false },
+            {
+                type: 'slider', height: 16, bottom: 6,
+                borderColor: 'rgba(26,26,24,.18)',
+                backgroundColor: 'rgba(239,233,219,.55)',
+                fillerColor: 'rgba(26,26,24,.10)',
+                handleStyle: { color: PALETTE.ink, borderColor: PALETTE.ink },
+                moveHandleStyle: { color: PALETTE.ink2 },
+                textStyle: { color: PALETTE.ink3, fontSize: 10 },
+                dataBackground: {
+                    lineStyle: { color: 'rgba(26,26,24,.25)' },
+                    areaStyle: { color: 'rgba(26,26,24,.06)' }
+                },
+                selectedDataBackground: {
+                    lineStyle: { color: PALETTE.cinnabar },
+                    areaStyle: { color: 'rgba(176,58,46,.10)' }
+                },
+            },
+        ];
+    }
+
+    function emptyChart(chart, text) {
+        chart.setOption({
+            ...chartBase(),
+            title: {
+                text: text, left: 'center', top: 'middle',
+                textStyle: { color: PALETTE.ink3, fontSize: 13, fontWeight: 'normal' }
+            },
+            xAxis: { show: false }, yAxis: { show: false }, series: [],
+        });
+    }
+
+    function renderViewsChart() {
+        if (!charts.views || !state.episodes.length) return;
+        const eps = state.episodes;
+        const labels = eps.map(e => '第' + e.title + '集');
+        const views = eps.map(e => (e.stat && e.stat.view) || null);
+        charts.views.setOption({
+            ...chartBase(),
+            tooltip: { ...chartBase().tooltip, trigger: 'axis',
+                formatter: ps => '<strong>' + ps[0].name + '</strong><br>播放 ' + fmt(ps[0].value) },
+            grid: { left: 62, right: 14, top: 18, bottom: 58 },
+            xAxis: { type: 'category', data: labels, axisLine: AXIS_LINE, axisTick: { show: false },
+                axisLabel: { color: PALETTE.ink3, fontSize: 10, rotate: 45,
+                    interval: Math.max(0, Math.floor(eps.length / 14)) } },
+            yAxis: { type: 'value', splitLine: SPLIT_LINE,
+                axisLabel: { color: PALETTE.ink3, formatter: v => fmt(v) } },
+            dataZoom: zoomConfig(Math.max(0, 100 - Math.ceil(60 / eps.length * 100))),
+            series: [{
+                name: '播放量', type: 'bar', data: views, barMaxWidth: 13,
+                itemStyle: {
+                    color: new echarts.graphic.LinearGradient(0, 0, 0, 1,
+                        [{ offset: 0, color: '#3c3c38' }, { offset: 1, color: '#9a948a' }]),
+                    borderRadius: [2, 2, 0, 0],
+                },
+                emphasis: { itemStyle: { color: PALETTE.cinnabar } },
+            }],
+        }, { notMerge: true });
+    }
+
+    function renderInteractionChart() {
+        if (!charts.inter || !state.episodes.length) return;
+        const eps = state.episodes;
+        const labels = eps.map(e => '第' + e.title + '集');
+        const pick = k => eps.map(e => (e.stat && e.stat[k]) || null);
+        const SERIES_STYLE = [
+            { name: '播放', key: 'view', color: PALETTE.ink, width: 2.2, yIdx: 0 },
+            { name: '弹幕', key: 'danmaku', color: PALETTE.cinnabar, width: 1.4, yIdx: 1 },
+            { name: '投币', key: 'coin', color: PALETTE.indigo, width: 1.4, yIdx: 1 },
+            { name: '点赞', key: 'like', color: PALETTE.indigoLight, width: 1.4, yIdx: 1 },
+            { name: '收藏', key: 'favorite', color: PALETTE.ink3, width: 1.4, yIdx: 1 },
+        ];
+        charts.inter.setOption({
+            ...chartBase(),
+            tooltip: { ...chartBase().tooltip, trigger: 'axis',
+                formatter: ps => '<strong>' + ps[0].name + '</strong><br>' +
+                    ps.filter(p => p.value != null)
+                      .map(p => p.marker + p.seriesName + ' ' + fmt(p.value)).join('<br>') },
+            legend: { top: 0, textStyle: { color: PALETTE.ink2, fontSize: 11 },
+                itemWidth: 18, itemHeight: 2, icon: 'rect' },
+            grid: { left: 62, right: 58, top: 34, bottom: 58 },
+            xAxis: { type: 'category', data: labels, axisLine: AXIS_LINE, axisTick: { show: false },
+                axisLabel: { color: PALETTE.ink3, fontSize: 10,
+                    interval: Math.max(0, Math.floor(eps.length / 14)) } },
+            yAxis: [
+                { type: 'value', name: '播放', nameTextStyle: { color: PALETTE.ink3 },
+                    splitLine: SPLIT_LINE, axisLabel: { color: PALETTE.ink3, formatter: v => fmt(v) } },
+                { type: 'value', name: '互动', nameTextStyle: { color: PALETTE.ink3 },
+                    splitLine: { show: false }, axisLabel: { color: PALETTE.ink3, formatter: v => fmt(v) } },
+            ],
+            dataZoom: zoomConfig(Math.max(0, 100 - Math.ceil(60 / eps.length * 100))),
+            series: SERIES_STYLE.map(s => ({
+                name: s.name, type: 'line', yAxisIndex: s.yIdx, data: pick(s.key),
+                smooth: true, symbol: 'none',
+                lineStyle: { color: s.color, width: s.width },
+                itemStyle: { color: s.color },
+                emphasis: { focus: 'series' },
+            })),
+        }, { notMerge: true });
+    }
+
+    function renderRadar(ep) {
+        if (!charts.radar) return;
+        const s = (ep && ep.stat) || null;
+        if (!s || !s.view) {
+            emptyChart(charts.radar, ep ? '该集统计加载中…' : '选择剧集后展示');
+            return;
+        }
+        const names = ['播放', '弹幕', '投币', '点赞', '评论', '收藏'];
+        const vals = [s.view, s.danmaku, s.coin, s.like, s.reply, s.favorite]
+            .map(v => Number(v) || 0);
+        charts.radar.setOption({
+            ...chartBase(),
+            tooltip: { ...chartBase().tooltip },
+            radar: {
+                indicator: names.map((n, i) => ({ name: n, max: Math.max(vals[i] * 1.3, 10) })),
+                radius: '62%',
+                splitNumber: 3,
+                axisName: { color: PALETTE.ink2, fontSize: 11 },
+                splitLine: { lineStyle: { color: 'rgba(26,26,24,.14)' } },
+                splitArea: { show: false },
+                axisLine: { lineStyle: { color: 'rgba(26,26,24,.16)' } },
+            },
+            series: [{
+                type: 'radar',
+                data: [{
+                    value: vals,
+                    name: '第' + ep.title + '集',
+                    areaStyle: { color: 'rgba(176,58,46,.14)' },
+                    lineStyle: { color: PALETTE.cinnabar, width: 1.8 },
+                    itemStyle: { color: PALETTE.cinnabar },
+                    symbolSize: 3,
+                }],
+            }],
+        }, { notMerge: true });
+    }
+
+    function renderTrend(list) {
+        if (!charts.trend) return;
+        if (!list || !list.length) {
+            emptyChart(charts.trend, '暂无趋势数据 · 服务端每60秒自动采集');
+            return;
+        }
+        charts.trend.setOption({
+            ...chartBase(),
+            tooltip: { ...chartBase().tooltip, trigger: 'axis',
+                formatter: ps => '<strong>' + ps[0].name + '</strong><br>在线 ' + fmt(ps[0].value) },
+            grid: { left: 56, right: 18, top: 18, bottom: 30 },
+            xAxis: { type: 'category',
+                data: list.map(p => new Date(p.time * 1000).toLocaleTimeString('zh-CN',
+                    { hour: '2-digit', minute: '2-digit' })),
+                axisLine: AXIS_LINE, axisTick: { show: false },
+                axisLabel: { color: PALETTE.ink3, fontSize: 10 } },
+            yAxis: { type: 'value', splitLine: SPLIT_LINE,
+                axisLabel: { color: PALETTE.ink3, formatter: v => fmt(v) } },
+            series: [{
+                name: '实时在线', type: 'line',
+                data: list.map(p => p.count),
+                smooth: true, symbol: 'circle', symbolSize: 4,
+                lineStyle: { color: PALETTE.cinnabar, width: 2 },
+                itemStyle: { color: PALETTE.cinnabar },
+                areaStyle: {
+                    color: new echarts.graphic.LinearGradient(0, 0, 0, 1,
+                        [{ offset: 0, color: 'rgba(176,58,46,.16)' },
+                         { offset: 1, color: 'rgba(176,58,46,0)' }]),
+                },
+            }],
+        }, { notMerge: true });
+    }
+
+    function initCharts() {
+        if (chartsInited || typeof echarts === 'undefined') return;
+        chartsInited = true;
+        charts.views = echarts.init($('chartViews'));
+        charts.radar = echarts.init($('chartRadar'));
+        charts.trend = echarts.init($('chartTrend'));
+        charts.inter = echarts.init($('chartInteraction'));
+        window.__charts = charts; // 验证句柄
+
+        renderViewsChart();
+        renderInteractionChart();
+        renderRadar(state.currentEp);
+        renderTrend(state._trendList || []);
+
+        window.addEventListener('resize',
+            debounce(() => Object.values(charts).forEach(c => c.resize()), 150));
+    }
+
+    // 图表数据钩子：数据先于图表就绪时缓存，初始化后补渲染
+    window.__chartsHook = {
+        epChanged(ep) { renderRadar(ep); },
+        trendChanged(list) { state._trendList = list; renderTrend(list); },
+        statsChanged() { renderViewsChart(); renderInteractionChart(); },
+    };
+
     // ============ 初始化 ============
     function init() {
         initQuotes();
@@ -418,6 +637,20 @@
         search.addEventListener('keydown', e => { if (e.key === 'Enter') search.blur(); });
 
         setInterval(updateStamp, 30000);
+
+        // 图表懒初始化：滚动接近时才建实例
+        const chartSection = document.querySelector('.charts-grid');
+        if (chartSection && 'IntersectionObserver' in window) {
+            const io = new IntersectionObserver(entries => {
+                if (entries.some(e => e.isIntersecting)) {
+                    io.disconnect();
+                    initCharts();
+                }
+            }, { rootMargin: '250px' });
+            io.observe(chartSection);
+        } else {
+            initCharts();
+        }
 
         loadAll(false);
         startAuto();
