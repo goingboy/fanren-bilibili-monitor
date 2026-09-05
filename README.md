@@ -4,6 +4,23 @@
 
 > 凡人修仙，仙路崎岖。一个普通的山村穷小子，偶然之下跨入到一个江湖小门派，虽然天资平庸，但依靠自身努力和合理处世，步步为营，最终修炼成仙。
 
+## 页面预览
+
+### 首页 — 英雄区
+![首页英雄区](static/images/screenshots/home-hero.png)
+
+### 数据总览
+![数据总览](static/images/screenshots/home-overview.png)
+
+### 集数列表 & 实时数据
+![集数列表与实时数据](static/images/screenshots/home-realtime.png)
+
+### 数据分析（趋势图 & 雷达图）
+![数据分析图表](static/images/screenshots/home-charts.png)
+
+### 动画百科
+![动画百科](static/images/screenshots/wiki-page.png)
+
 ## 功能特性
 
 ### 数据监控
