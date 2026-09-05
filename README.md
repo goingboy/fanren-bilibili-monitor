@@ -6,8 +6,8 @@
 
 ## 页面预览
 
-### 首页 — 英雄区
-![首页英雄区](static/images/screenshots/home-hero.png)
+### 首页 — 韩立仙途
+![首页韩立仙途](static/images/screenshots/home-hero.png)
 
 ### 数据总览
 ![数据总览](static/images/screenshots/home-overview.png)

@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: fanren-monitor
+    runtime: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn wsgi:app --bind 0.0.0.0:$PORT
+    envVars:
+      - key: FM_HOST
+        value: "0.0.0.0"
+      - key: FM_DEBUG
+        value: "0"
