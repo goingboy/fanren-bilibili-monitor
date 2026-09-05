@@ -3,7 +3,6 @@ __pycache__/
 data/
 .git/
 docs/
-*.md
 
 fm_*.log
 
