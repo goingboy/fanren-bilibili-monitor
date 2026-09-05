@@ -124,12 +124,6 @@
         }
     }
 
-    // ---- 印章色调轮换（墨/朱/黛） ----
-    const TONES = ['seal-ink', 'seal-cinnabar', 'seal-indigo'];
-    document.querySelectorAll('.wiki-detail-avatar').forEach((a, i) => {
-        a.classList.add(TONES[i % 3]);
-    });
-
     // ---- 标签计数 ----
     document.querySelectorAll('.wiki-tab').forEach(t => {
         const c = document.getElementById('tab-' + t.dataset.tab);

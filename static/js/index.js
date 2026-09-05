@@ -136,21 +136,21 @@
 
         // 刻度按当前总集数动态生成
         const markers = $('progressMarkers');
-        if (markers.childElementCount !== REALMS.length || markers.dataset.total !== String(total)) {
-            markers.innerHTML = '';
-            REALMS.forEach((r, i) => {
-                const m = document.createElement('span');
-                m.className = 'marker';
-                const right = i === REALMS.length - 1;
-                m.style.left = right ? '100%' : (r.ep / total * 100).toFixed(1) + '%';
-                m.textContent = r.name.replace('期', '');
-                if (right) m.style.transform = 'translateX(-100%)';
-                markers.appendChild(m);
-            });
-            markers.dataset.total = String(total);
-        }
+        markers.innerHTML = '';
+        REALMS.forEach((r, i) => {
+            if (r.ep > total && i !== 0) return;
+            const m = document.createElement('span');
+            m.className = 'marker';
+            const pct = Math.min(r.ep / total * 100, 99.5);
+            m.style.left = pct.toFixed(1) + '%';
+            if (pct >= 95) m.style.transform = 'translateX(-100%)';
+            m.textContent = r.name.replace('期', '');
+            markers.appendChild(m);
+        });
+        markers.dataset.total = String(total);
+        const visibleRealms = REALMS.filter((r, i) => r.ep <= total || i === 0);
         document.querySelectorAll('#progressMarkers .marker').forEach((m, i) => {
-            m.classList.toggle('reached', !!REALMS[i] && latestNum >= REALMS[i].ep);
+            m.classList.toggle('reached', !!visibleRealms[i] && latestNum >= visibleRealms[i].ep);
         });
         document.title = '凡人修仙传 · 已更新至第' + latestNum + '集';
     }
