@@ -1,0 +1,16 @@
+[build-system]
+requires = ["setuptools>=45", "wheel"]
+build-backend = "setuptools.backends._legacy:_Backend"
+
+[project]
+name = "fanren-monitor"
+version = "1.0.0"
+requires-python = ">=3.8"
+dependencies = [
+    "flask==3.0.0",
+    "requests==2.31.0",
+    "gunicorn==22.0.0",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
