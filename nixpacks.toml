@@ -1,0 +1,8 @@
+[phases.setup]
+nixPkgs = ["python310"]
+
+[phases.build]
+cmds = ["pip install -r requirements.txt"]
+
+[phases.run]
+cmd = "gunicorn wsgi:app --bind 0.0.0.0:$PORT"
